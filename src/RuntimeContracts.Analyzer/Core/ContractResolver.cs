@@ -38,7 +38,7 @@ namespace RuntimeContracts.Analyzer.Core
         {
             _semanticModel = semanticModel;
 
-            _standardContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(typeof(System.Diagnostics.Contracts.Contract).FullName);
+            _standardContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.Contracts.Contract");
             _contractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(typeof(System.Diagnostics.ContractsLight.Contract).FullName);
         }
 
@@ -51,7 +51,7 @@ namespace RuntimeContracts.Analyzer.Core
         /// Returns true if a given <paramref name="invocationExpression"/> invokes member
         /// of a <see cref="System.Diagnostics.Contracts.Contract"/> class.
         /// </summary>
-        [System.Diagnostics.Contracts.Pure]
+        //[System.Diagnostics.Contracts.Pure]
         public bool IsStandardContractInvocation(
             InvocationExpressionSyntax invocationExpression,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
@@ -63,7 +63,7 @@ namespace RuntimeContracts.Analyzer.Core
         /// Returns true if a given <paramref name="invocationExpression"/> invokes member
         /// of a <see cref="System.Diagnostics.ContractsLight.Contract"/> class.
         /// </summary>
-        [System.Diagnostics.Contracts.Pure]
+        //[System.Diagnostics.Contracts.Pure]
         public bool IsContractInvocation(
             InvocationExpressionSyntax invocationExpression,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
@@ -76,29 +76,29 @@ namespace RuntimeContracts.Analyzer.Core
             switch (methodName)
             {
                 // Names for both standard contract type and the lightweight one are the same.
-                case nameof(System.Diagnostics.Contracts.Contract.Assert):
+                case "Assert":
                     return ContractMethodNames.Assert;
-                case nameof(System.Diagnostics.Contracts.Contract.Assume):
+                case "Assume":
                     return ContractMethodNames.Assume;
-                case nameof(System.Diagnostics.Contracts.Contract.EndContractBlock):
+                case "EndContractBlock":
                     return ContractMethodNames.EndContractBlock;
-                case nameof(System.Diagnostics.Contracts.Contract.Ensures):
+                case "Ensures":
                     return ContractMethodNames.Ensures;
-                case nameof(System.Diagnostics.Contracts.Contract.EnsuresOnThrow):
+                case "EnsuresOnThrow":
                     return ContractMethodNames.EnsuresOnThrow;
-                case nameof(System.Diagnostics.Contracts.Contract.Exists):
+                case "Exists":
                     return ContractMethodNames.Exists;
-                case nameof(System.Diagnostics.Contracts.Contract.ForAll):
+                case "ForAll":
                     return ContractMethodNames.ForAll;
-                case nameof(System.Diagnostics.Contracts.Contract.Invariant):
+                case "Invariant":
                     return ContractMethodNames.Invariant;
-                case nameof(System.Diagnostics.Contracts.Contract.OldValue):
+                case "OldValue":
                     return ContractMethodNames.OldValue;
-                case nameof(System.Diagnostics.Contracts.Contract.Requires):
+                case "Requires":
                     return ContractMethodNames.Requires;
-                case nameof(System.Diagnostics.Contracts.Contract.Result):
+                case "Result":
                     return ContractMethodNames.Result;
-                case nameof(System.Diagnostics.Contracts.Contract.ValueAtReturn):
+                case "ValueAtReturn":
                     return ContractMethodNames.ValueAtReturn;
                 default:
                     return ContractMethodNames.None;

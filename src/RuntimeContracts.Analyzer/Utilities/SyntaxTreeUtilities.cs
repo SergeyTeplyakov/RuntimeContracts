@@ -17,7 +17,7 @@ namespace RuntimeContracts.Analyzer.Utilities
     {
         public static SyntaxNode AddOrReplaceContractNamespaceUsings(SyntaxNode root)
         {
-            var standardContractNamespace = typeof(System.Diagnostics.Contracts.Contract).Namespace;
+            var standardContractNamespace = "System.Diagnostics.Contracts";
             var contractNamespace = typeof(System.Diagnostics.ContractsLight.Contract).Namespace;
 
             // The method removes 'using System.Diagnostics.Contracts;' and renames it to 'using System.Diagnostics.ContractsLight;'.
