@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
-    <id>RuntimeContracts.Analyzer</id>
-    <version>1.0.0</version>
+    <id>RuntimeContracts</id>
+    <version>0.1.6.0</version>
     <authors>seteplia</authors>
     <owners>seteplia</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -12,17 +12,15 @@
     <description>RuntimeContracts.Analyzer</description>
     <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
     <copyright>Copyright</copyright>
-    <tags>RuntimeContracts.Analyzer, analyzers</tags>
+    <tags>RuntimeContracts</tags>
     <repository url="http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE" />
     <dependencies>
-      <group targetFramework=".NETStandard1.6">
-        <dependency id="RuntimeContracts" version="1.0.0" exclude="Build,Analyzers" />
+      <group targetFramework=".NETStandard1.3">
+        <dependency id="RuntimeContracts.Analyzer" version="0.1.6" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="D:\Sources\RuntimeContracts\src\RuntimeContracts.Analyzer\tools\install.ps1" target="tools\install.ps1" />
-    <file src="D:\Sources\RuntimeContracts\src\RuntimeContracts.Analyzer\tools\uninstall.ps1" target="tools\uninstall.ps1" />
-    <file src="D:\Sources\RuntimeContracts\src\RuntimeContracts.Analyzer\bin\Debug\netstandard1.6\RuntimeContracts.Analyzer.dll" target="analyzers\dotnet\cs\RuntimeContracts.Analyzer.dll" />
+    <file src="bin/release/**/*.dll" target="lib" />
   </files>
 </package>

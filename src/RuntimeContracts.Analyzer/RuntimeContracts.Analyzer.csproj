@@ -8,7 +8,7 @@
   
   <PropertyGroup>
     <PackageId>RuntimeContracts.Analyzer</PackageId>
-    <PackageVersion>0.1.5.0</PackageVersion>
+    <PackageVersion>0.1.6.0</PackageVersion>
     <Authors>seteplia</Authors>
     <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
     <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
@@ -20,6 +20,7 @@
     <Copyright>Copyright</Copyright>
     <PackageTags>RuntimeContracts.Analyzer, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   
   <ItemGroup>
