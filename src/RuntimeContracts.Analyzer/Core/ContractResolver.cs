@@ -1,9 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RuntimeContracts.Analyzer.Utilities;
 
 namespace RuntimeContracts.Analyzer.Core
 {
+    [Flags]
     public enum ContractMethodNames
     {
         None,
@@ -70,7 +72,7 @@ namespace RuntimeContracts.Analyzer.Core
         {
             return IsContractInvocation(invocationExpression, allowedMethodNames, _contractTypeSymbol);
         }
-
+        
         private static ContractMethodNames ParseContractMethodName(string methodName)
         {
             switch (methodName)

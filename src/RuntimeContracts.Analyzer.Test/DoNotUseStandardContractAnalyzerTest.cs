@@ -6,7 +6,7 @@ using TestHelper;
 namespace RuntimeContracts.Analyzer.Test
 {
     [TestClass]
-    public class UnitTest : CodeFixVerifier
+    public class DoNotUseStandardContractAnalyzerTest : CodeFixVerifier
     {
         [TestMethod]
         public void FailsOnContractRequires()
