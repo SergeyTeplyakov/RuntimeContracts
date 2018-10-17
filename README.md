@@ -1,1 +1,2 @@
-# Runtime-only version of Code Contracts
+# RuntimeContracts
+Library-based implementation of Code Contracts-like API
