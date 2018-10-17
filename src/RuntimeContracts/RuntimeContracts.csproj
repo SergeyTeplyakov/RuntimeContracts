@@ -12,21 +12,20 @@
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
-<ItemGroup>
+  <ItemGroup>
     <PackageReference Include="RuntimeContracts.Analyzer" Version="0.1.6" />
-</ItemGroup>
+  </ItemGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.1.6.0</PackageVersion>
+    <PackageVersion>0.1.7.0</PackageVersion>
     <Authors>seteplia</Authors>
-    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/SergeyTeplyakov/RuntimeContracts/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 
     <Description>RuntimeContracts</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <PackageReleaseNotes>Moved the code to github. Added license.</PackageReleaseNotes>
     <Copyright>Copyright</Copyright>
     <PackageTags>RuntimeContracts, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
