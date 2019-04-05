@@ -96,7 +96,6 @@ using System.Diagnostics.Contracts;
                 [|Contract.Requires(s != null)|];
             }
         }
-    }
 }    
 
     namespace ConsoleApplication1
@@ -113,14 +112,7 @@ using System.Diagnostics.Contracts;
 
             await new VerifyCS.Test
             {
-                TestState =
-                {
-                    Sources = { test },
-                    ExpectedDiagnostics =
-                    {
-                        DiagnosticResult.CompilerError("CS1022").WithSpan(13, 1, 13, 2).WithMessage("Type or namespace definition, or end-of-file expected"),
-                    },
-                },
+                TestState = { Sources = { test } },
                 FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
                 CodeFixValidationMode = CodeFixValidationMode.None,
             }.WithoutGeneratedCodeVerification().RunAsync();
