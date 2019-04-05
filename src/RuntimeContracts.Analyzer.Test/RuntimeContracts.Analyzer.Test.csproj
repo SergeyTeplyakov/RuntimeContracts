@@ -1,20 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <ApplicationIcon />
-    <OutputType>Library</OutputType>
-    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.MSTest" Version="1.0.0-beta1.19204.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing.MSTest" Version="1.0.0-beta1.19204.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RuntimeContracts\RuntimeContracts.csproj" />
     <ProjectReference Include="..\RuntimeContracts.Analyzer\RuntimeContracts.Analyzer.csproj" />
   </ItemGroup>
 
