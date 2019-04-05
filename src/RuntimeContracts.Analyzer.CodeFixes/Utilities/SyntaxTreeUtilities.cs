@@ -18,7 +18,7 @@ namespace RuntimeContracts.Analyzer.Utilities
 
             var newUsing =
                 SyntaxFactory.UsingDirective(
-                        SyntaxFactory.IdentifierName(contractNamespace))
+                        SyntaxFactory.ParseName(contractNamespace))
                     .NormalizeWhitespace()
                     .WithTrailingTrivia(SyntaxTriviaList.Create(SyntaxFactory.CarriageReturnLineFeed));
 

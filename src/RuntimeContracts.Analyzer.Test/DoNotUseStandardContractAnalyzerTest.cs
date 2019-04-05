@@ -53,7 +53,6 @@ using System.Diagnostics.Contracts;
             {
                 TestState = { Sources = { test } },
                 FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-                CodeFixValidationMode = CodeFixValidationMode.None,
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
@@ -78,7 +77,6 @@ using System.Diagnostics.Contracts;
             {
                 TestState = { Sources = { test } },
                 FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-                CodeFixValidationMode = CodeFixValidationMode.None,
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
@@ -114,7 +112,6 @@ using System.Diagnostics.Contracts;
             {
                 TestState = { Sources = { test } },
                 FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-                CodeFixValidationMode = CodeFixValidationMode.None,
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
     }
