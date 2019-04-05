@@ -26,6 +26,7 @@ namespace RuntimeContracts.Analyzer
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
             context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.InvocationExpression);
         }
