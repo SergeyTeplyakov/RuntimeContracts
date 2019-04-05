@@ -23,6 +23,8 @@ namespace RuntimeContracts.Analyzer
 
         public override void Initialize(AnalysisContext context)
         {
+            context.EnableConcurrentExecution();
+
             context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.InvocationExpression);
         }
 
