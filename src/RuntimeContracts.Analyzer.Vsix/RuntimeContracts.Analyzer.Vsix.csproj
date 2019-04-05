@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RuntimeContracts.Analyzer\RuntimeContracts.Analyzer.csproj" />
+    <ProjectReference Include="..\RuntimeContracts.Analyzer.CodeFixes\RuntimeContracts.Analyzer.CodeFixes.csproj" />
   </ItemGroup>
 
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
