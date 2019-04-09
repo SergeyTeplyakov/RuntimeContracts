@@ -41,7 +41,7 @@ namespace RuntimeContracts.Analyzer.Core
             _semanticModel = semanticModel;
 
             _standardContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.Contracts.Contract");
-            _contractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(typeof(System.Diagnostics.ContractsLight.Contract).FullName);
+            _contractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.ContractsLight.Contract");
         }
 
         /// <summary>

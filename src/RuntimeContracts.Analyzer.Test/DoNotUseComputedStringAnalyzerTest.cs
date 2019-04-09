@@ -1,17 +1,16 @@
-using System;
-using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestHelper;
+using System.Threading.Tasks;
+using VerifyCS = RuntimeContracts.Analyzer.Test.CSharpCodeFixVerifier<
+    RuntimeContracts.Analyzer.DoNotUseComputedStringAnalyzer,
+    Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
 
 namespace RuntimeContracts.Analyzer.Test
 {
     [TestClass]
-    public class DoNotUseComputedStringAnalyzerTest : CodeFixVerifier
+    public class DoNotUseComputedStringAnalyzerTest
     {
         [TestMethod]
-        public void FailsWhenAssertWithInterpolatedMessage()
+        public async Task FailsWhenAssertWithInterpolatedMessage()
         {
             var test = @"using System.Diagnostics.ContractsLight;
 
@@ -21,17 +20,19 @@ namespace RuntimeContracts.Analyzer.Test
                 {
                     public TypeName(string s)
                     {
-                        Contract.Assert(s != null, $""String {s} is not null."");
+                        [|Contract.Assert(s != null, $""String {s} is not null."")|];
                     }
                 }
             }";
 
-            var diagnostic = GetFirstDiagnostic(test);
-            Assert.AreEqual(diagnostic.Id, DoNotUseComputedStringAnalyzer.DiagnosticId);
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
         [TestMethod]
-        public void FailsWhenAssertWithStringConcat()
+        public async Task FailsWhenAssertWithStringConcat()
         {
             var test = @"using System.Diagnostics.ContractsLight;
 
@@ -41,17 +42,19 @@ namespace RuntimeContracts.Analyzer.Test
                 {
                     public TypeName(string s)
                     {
-                        Contract.Assert(s != null, ""String "" + s + ""is not null."");
+                        [|Contract.Assert(s != null, ""String "" + s + ""is not null."")|];
                     }
                 }
             }";
 
-            var diagnostic = GetFirstDiagnostic(test);
-            Assert.AreEqual(diagnostic.Id, DoNotUseComputedStringAnalyzer.DiagnosticId);
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
         [TestMethod]
-        public void NoWarnsWhenAssertWithStringConcatWithoutExpressions()
+        public async Task NoWarnsWhenAssertWithStringConcatWithoutExpressions()
         {
             var test = @"using System.Diagnostics.ContractsLight;
 
@@ -66,11 +69,11 @@ namespace RuntimeContracts.Analyzer.Test
                 }
             }";
 
-            NoDiagnostic(test);
+            await VerifyCS.VerifyAnalyzerAsync(test);
         }
 
         [TestMethod]
-        public void NoWarnWhenAssertWithLiteral()
+        public async Task NoWarnWhenAssertWithLiteral()
         {
             var test = @"using System.Diagnostics.ContractsLight;
 
@@ -85,11 +88,11 @@ namespace RuntimeContracts.Analyzer.Test
                 }
             }";
 
-            NoDiagnostic(test);
+            await VerifyCS.VerifyAnalyzerAsync(test);
         }
 
         [TestMethod]
-        public void NoWarnWhenAssertWhenTheFirstArgumentIsFalse()
+        public async Task NoWarnWhenAssertWhenTheFirstArgumentIsFalse()
         {
             var test = @"using System.Diagnostics.ContractsLight;
 
@@ -104,11 +107,11 @@ namespace RuntimeContracts.Analyzer.Test
                 }
             }";
 
-            NoDiagnostic(test);
+            await VerifyCS.VerifyAnalyzerAsync(test);
         }
 
         [TestMethod]
-        public void NoWarnWhenAssertWithInterpolatedStringWithoutCaptures()
+        public async Task NoWarnWhenAssertWithInterpolatedStringWithoutCaptures()
         {
             var test = @"using System.Diagnostics.ContractsLight;
 
@@ -123,39 +126,7 @@ namespace RuntimeContracts.Analyzer.Test
                 }
             }";
 
-            NoDiagnostic(test);
+            await VerifyCS.VerifyAnalyzerAsync(test);
         }
-
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new DoNotUseComputedStringAnalyzer();
-        }
-
-        private Diagnostic GetFirstDiagnostic(string source)
-        {
-            var diagnostics = GetSortedDiagnostics(source + Environment.NewLine + ContractClass);
-            return diagnostics.First();
-        }
-
-        private void NoDiagnostic(string source)
-        {
-            var diagnostics = GetSortedDiagnostics(source + Environment.NewLine + ContractClass);
-            if (diagnostics.Any())
-            {
-                Assert.IsTrue(false, string.Format("\r\n", diagnostics.Select(d => d.ToString())));
-            }
-        }
-
-        private const string ContractClass = @"
-namespace System.Diagnostics.ContractsLight
-{
-    public static class Contract
-    {
-        public static void Requires(bool b, string s = null) {}
-        public static void Assert(bool b, string s = null) {}
-        public static void Assume(bool b, string s = null) {}
-    }
-}
-";
     }
 }

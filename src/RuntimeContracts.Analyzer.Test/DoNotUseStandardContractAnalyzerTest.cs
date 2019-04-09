@@ -1,15 +1,17 @@
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestHelper;
+using System.Threading.Tasks;
+using VerifyCS = RuntimeContracts.Analyzer.Test.CSharpCodeFixVerifier<
+    RuntimeContracts.Analyzer.DoNotUseStandardContractAnalyzer,
+    RuntimeContracts.Analyzer.RuntimeContractsAnalyzerCodeFixProvider>;
 
 namespace RuntimeContracts.Analyzer.Test
 {
     [TestClass]
-    public class DoNotUseStandardContractAnalyzerTest : CodeFixVerifier
+    public class DoNotUseStandardContractAnalyzerTest
     {
         [TestMethod]
-        public void FailsOnContractRequires()
+        public async Task FailsOnContractRequires()
         {
             var test = @"using System.Diagnostics.Contracts;
     
@@ -19,17 +21,19 @@ namespace RuntimeContracts.Analyzer.Test
         {
             public TypeName(string s)
             {
-                Contract.Requires(s != null);
+                [|Contract.Requires(s != null)|];
             }
         }
     }";
 
-            var diagnostic = GetFirstDiagnosticFor(test);
-            Assert.AreEqual(diagnostic.Id, DoNotUseStandardContractAnalyzer.DiagnosticId);
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
         [TestMethod]
-        public void FixUsingOnTopLevel()
+        public async Task FixUsingOnTopLevel()
         {
             var test = @"using System;
 using System.Diagnostics.Contracts;
@@ -40,19 +44,20 @@ using System.Diagnostics.Contracts;
         {
             public TypeName(string s)
             {
-                Contract.Requires(s != null);
+                [|Contract.Requires(s != null)|];
             }
         }
     }";
 
-            var diagnostic = GetFirstDiagnosticFor(test);
-            Assert.AreEqual(diagnostic.Id, DoNotUseStandardContractAnalyzer.DiagnosticId);
-
-            VerifyCSharpFix(test, test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight"), codeFixIndex: null, allowNewCompilerDiagnostics: true);
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
         [TestMethod]
-        public void FixUsingInsideNamespace()
+        public async Task FixUsingInsideNamespace()
         {
             var test = @"using System;
     
@@ -63,19 +68,20 @@ using System.Diagnostics.Contracts;
         {
             public TypeName(string s)
             {
-                Contract.Requires(s != null);
+                [|Contract.Requires(s != null)|];
             }
         }
     }";
 
-            var diagnostic = GetFirstDiagnosticFor(test);
-            Assert.AreEqual(diagnostic.Id, DoNotUseStandardContractAnalyzer.DiagnosticId);
-
-            VerifyCSharpFix(test, test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight"), codeFixIndex: null, allowNewCompilerDiagnostics: true);
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
         [TestMethod]
-        public void FixUsingInsideSecondNamespace()
+        public async Task FixUsingInsideSecondNamespace()
         {
             var test = @"using System;
 
@@ -85,10 +91,9 @@ using System.Diagnostics.Contracts;
         {
             public TypeName(string s)
             {
-                Contract.Requires(s != null);
+                [|Contract.Requires(s != null)|];
             }
         }
-    }
 }    
 
     namespace ConsoleApplication1
@@ -98,38 +103,16 @@ using System.Diagnostics.Contracts;
         {
             public TypeName(string s)
             {
-                Contract.Requires(s != null);
+                [|Contract.Requires(s != null)|];
             }
         }
     }";
 
-            var diagnostic = GetFirstDiagnosticFor(test);
-            Assert.AreEqual(diagnostic.Id, DoNotUseStandardContractAnalyzer.DiagnosticId);
-
-            VerifyCSharpFix(test, test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight"), codeFixIndex: null, allowNewCompilerDiagnostics: true);
-        }
-
-        protected override string GetAdditionalSources()
-        {
-            return @"
-namespace System.Diagnostics.ContractsLight
-{
-    public static class Contract
-    {
-        public static void Requires(bool predicate, string message = null) {}
-        public static void Assert(bool predicate, string message = null) {}
-    }
-}";
-        }
-
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
-        {
-            return new RuntimeContractsAnalyzerCodeFixProvider();
-        }
-
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new DoNotUseStandardContractAnalyzer();
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
         }
     }
 }
