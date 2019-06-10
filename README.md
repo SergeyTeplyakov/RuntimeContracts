@@ -20,7 +20,7 @@ Contract-based programming in .NET is represented via [`Contract`](https://refer
 
 This design decision allowed gradual adoption of the DbC but faced some serious challenges along the way.
 
-The main challenge is the necessaty of external tools in order to "embed" assertions in the final code. This was a natural requirement, because some assertions (like postconditions and invariants) require some code manipulation at compile time and there was no other ways to achieve this without changing all .NET languages. For instance, the postonciditons are checked at every exit point of a method, and library-based approach means that the IL code must be rewritten in order to embed them and have any impact at runtime.
+The main challenge is the necessity of external tools in order to "embed" assertions in the final code. This was a natural requirement, because some assertions (like postconditions and invariants) require some code manipulation at compile time and there was no other ways to achieve this without changing all .NET languages. For instance, the postonciditons are checked at every exit point of a method, and library-based approach means that the IL code must be rewritten in order to embed them and have any impact at runtime.
 
 There are few critical issues with the existing tooling. Current behavior of both static checker and IL rewriter is not deterministic, the tools do not support .NET core and, most importantly, they're [open sourced](https://github.com/Microsoft/CodeContracts) but no longer supported.
 
