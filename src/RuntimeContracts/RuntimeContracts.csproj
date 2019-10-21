@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.1.8.0</PackageVersion>
+    <PackageVersion>0.1.9.0</PackageVersion>
     <Authors>seteplia</Authors>
     <PackageLicenseUrl>https://github.com/SergeyTeplyakov/RuntimeContracts/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
