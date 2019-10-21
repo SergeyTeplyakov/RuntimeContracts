@@ -13,7 +13,7 @@ namespace RuntimeContracts.Analyzer
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RuntimeContractsAnalyzerCodeFixProvider)), Shared]
     public class RuntimeContractsAnalyzerCodeFixProvider : CodeFixProvider
     {
-        private const string Title = "Use System.Diagnostics.ContractsLight.";
+        private const string Title = "Use System.Diagnostics.ContractsLight namespace.";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(DoNotUseStandardContractAnalyzer.DiagnosticId);
 
@@ -29,19 +29,19 @@ namespace RuntimeContracts.Analyzer
             // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
             var diagnostic = context.Diagnostics.First();
 
-            // The call to Contract.* could be a fully-qualified one or via the using staement.
+            // The call to Contract.* could be a fully-qualified one or via the using statement.
             var declaration = root.FindNode(diagnostic.Location.SourceSpan);
             
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: Title,
-                    createChangedDocument: c => AddOrReplaceUsings(context.Document, declaration, c), 
+                    createChangedDocument: c => AddOrReplaceUsingsAsync(context.Document, c), 
                     equivalenceKey: Title),
                 diagnostic);
         }
 
-        private async Task<Document> AddOrReplaceUsings(Document document, SyntaxNode invocationExpression, CancellationToken cancellationToken)
+        private static async Task<Document> AddOrReplaceUsingsAsync(Document document, CancellationToken cancellationToken)
         {
             var oldRoot = await document.GetSyntaxRootAsync(cancellationToken);
             return document.WithSyntaxRoot(SyntaxTreeUtilities.AddOrReplaceContractNamespaceUsings(oldRoot));

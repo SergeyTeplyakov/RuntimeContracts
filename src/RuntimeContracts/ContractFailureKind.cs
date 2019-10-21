@@ -35,23 +35,16 @@
         /// </summary>
         public static string ToDisplayString(this ContractFailureKind failureKind)
         {
-            switch (failureKind)
+            return failureKind switch
             {
-                case ContractFailureKind.Precondition:
-                    return "Precondition failed";
-                case ContractFailureKind.Postcondition:
-                    return "Postcondition failed";
-                case ContractFailureKind.PostconditionOnException:
-                    return "Postcondition failed after throwing an exception";
-                case ContractFailureKind.Invariant:
-                    return "Invariant failed";
-                case ContractFailureKind.Assert:
-                    return "Assertion failed";
-                case ContractFailureKind.Assume:
-                    return "Assumption failed";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(failureKind), failureKind, null);
-            }
+                ContractFailureKind.Precondition => "Precondition failed",
+                ContractFailureKind.Postcondition => "Postcondition failed",
+                ContractFailureKind.PostconditionOnException => "Postcondition failed after throwing an exception",
+                ContractFailureKind.Invariant => "Invariant failed",
+                ContractFailureKind.Assert => "Assertion failed",
+                ContractFailureKind.Assume => "Assumption failed",
+                _ => throw new ArgumentOutOfRangeException(nameof(failureKind), failureKind, null),
+            };
         }
     }
 }

@@ -308,6 +308,7 @@ namespace System.Diagnostics.ContractsLight
             return true;
         }
 
+#if CONTRACTS_LIGHT_PRECONDITIONS
         private static bool CheckForAll<T>(IEnumerable<T> collection, Predicate<T> predicate)
         {
             if (collection == null)
@@ -332,6 +333,7 @@ namespace System.Diagnostics.ContractsLight
 
             return true;
         }
+#endif
 
         /// <summary>
         /// Returns whether the <paramref name="predicate"/> returns <c>true</c> 

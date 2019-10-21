@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,24 +12,21 @@ namespace RuntimeContracts.Analyzer.Utilities
     {
         public static SyntaxNode AddOrReplaceContractNamespaceUsings(SyntaxNode root)
         {
-            var standardContractNamespace = "System.Diagnostics.Contracts";
             var contractNamespace = "System.Diagnostics.ContractsLight";
 
             // The method removes 'using System.Diagnostics.Contracts;' and renames it to 'using System.Diagnostics.ContractsLight;'.
-
             var newUsing =
                 SyntaxFactory.UsingDirective(
                         SyntaxFactory.ParseName(contractNamespace))
                     .NormalizeWhitespace()
                     .WithTrailingTrivia(SyntaxTriviaList.Create(SyntaxFactory.CarriageReturnLineFeed));
 
-            bool rootWasModified = false;
-            Dictionary<SyntaxNode, SyntaxNode> replacement = new Dictionary<SyntaxNode, SyntaxNode>();
-            // TODO: super naive pproach
-
+            var replacement = new Dictionary<SyntaxNode, SyntaxNode>();
+            
+            // TODO: super naive approach
             foreach (var rootNamespace in root.DescendantNodesAndSelf().OfType<NamespaceDeclarationSyntax>().ToList())
             {
-                if (ReplaceInsideNamespace(rootNamespace, out var newNamespaceNode))
+                if (ReplaceInsideNamespace(rootNamespace, newUsing, out var newNamespaceNode))
                 {
                     replacement[rootNamespace] = newNamespaceNode;
                 }
@@ -38,12 +36,6 @@ namespace RuntimeContracts.Analyzer.Utilities
             {
                 return root.ReplaceNodes(replacement.Keys, (node, syntaxNode) => replacement[node]);
             }
-            //// Namespace using may be inside the namespace
-            //var rootNamespace = root.FindNode<NamespaceDeclarationSyntax>();
-            //if (ReplaceInsideNamespace(rootNamespace, out var newNamespaceNode))
-            //{
-            //    return root.ReplaceNode(rootNamespace, newNamespaceNode);
-            //}
 
             // Or at the top level
             var compilation = root.FindNode<CompilationUnitSyntax>();
@@ -52,36 +44,12 @@ namespace RuntimeContracts.Analyzer.Utilities
                 return root.ReplaceNode(compilation, newCompilation);
             }
 
-            if (rootWasModified)
-            {
-                return root;
-            }
-
             var newUsings = compilation.Usings.Add(newUsing);
 
             return root.ReplaceNode(compilation, compilation.WithUsings(newUsings));
 
             // Local functions
-            bool FindIndex(IEnumerable<UsingDirectiveSyntax> localUsings, out int localIndex)
-            {
-                return localUsings
-                    .FindIndex(p => p.Name.GetText().ToString() == standardContractNamespace, out localIndex);
-            }
-
-            bool ReplaceInsideNamespace(NamespaceDeclarationSyntax namespaceRoot, out NamespaceDeclarationSyntax newNamespaceRoot)
-            {
-                var namespaceUsings = namespaceRoot.Usings;
-                if (FindIndex(namespaceRoot.Usings, out int namespaceIndex))
-                {
-                    newNamespaceRoot = namespaceRoot.WithUsings(namespaceUsings.Replace(namespaceUsings[namespaceIndex], newUsing));
-                    return true;
-                }
-
-                newNamespaceRoot = null;
-                return false;
-            }
-
-            bool ReplaceForTopLevel(CompilationUnitSyntax compilationRoot, out CompilationUnitSyntax newCompilationRoot)
+            bool ReplaceForTopLevel(CompilationUnitSyntax compilationRoot, out CompilationUnitSyntax? newCompilationRoot)
             {
                 var namespaceUsings = compilationRoot.Usings;
                 if (FindIndex(compilationRoot.Usings, out int namespaceIndex))
@@ -93,6 +61,27 @@ namespace RuntimeContracts.Analyzer.Utilities
                 newCompilationRoot = null;
                 return false;
             }
+        }
+
+        private static bool ReplaceInsideNamespace(NamespaceDeclarationSyntax namespaceRoot, UsingDirectiveSyntax newUsing, [NotNullWhen(true)] out NamespaceDeclarationSyntax? newNamespaceRoot)
+        {
+            var namespaceUsings = namespaceRoot.Usings;
+            if (FindIndex(namespaceRoot.Usings, out int namespaceIndex))
+            {
+                newNamespaceRoot = namespaceRoot.WithUsings(namespaceUsings.Replace(namespaceUsings[namespaceIndex], newUsing));
+                return true;
+            }
+
+            newNamespaceRoot = null;
+            return false;
+        }
+
+        private static bool FindIndex(IEnumerable<UsingDirectiveSyntax> localUsings, out int localIndex)
+        {
+            var standardContractNamespace = "System.Diagnostics.Contracts";
+
+            return localUsings
+                .FindIndex(p => p.Name.GetText().ToString() == standardContractNamespace, out localIndex);
         }
 
         public static TNode FindNode<TNode>(this SyntaxNode node)

@@ -3,6 +3,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RuntimeContracts.Analyzer.Utilities;
 
+#nullable enable
+
 namespace RuntimeContracts.Analyzer.Core
 {
     [Flags]
@@ -25,7 +27,7 @@ namespace RuntimeContracts.Analyzer.Core
     }
 
     /// <summary>
-    /// Helper class that resolves all invocations to <see cref="System.Diagnostics.ContractsLight.Contract"/> class
+    /// Helper class that resolves all invocations to <code>System.Diagnostics.ContractsLight.Contract</code> class
     /// with all utilities useful to extract invocation for different method invocation.
     /// </summary>
     public sealed class ContractResolver
@@ -53,7 +55,6 @@ namespace RuntimeContracts.Analyzer.Core
         /// Returns true if a given <paramref name="invocationExpression"/> invokes member
         /// of a <see cref="System.Diagnostics.Contracts.Contract"/> class.
         /// </summary>
-        //[System.Diagnostics.Contracts.Pure]
         public bool IsStandardContractInvocation(
             InvocationExpressionSyntax invocationExpression,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
@@ -63,48 +64,56 @@ namespace RuntimeContracts.Analyzer.Core
 
         /// <summary>
         /// Returns true if a given <paramref name="invocationExpression"/> invokes member
-        /// of a <see cref="System.Diagnostics.ContractsLight.Contract"/> class.
+        /// of a System.Diagnostics.ContractsLight.Contract class.
         /// </summary>
-        //[System.Diagnostics.Contracts.Pure]
         public bool IsContractInvocation(
             InvocationExpressionSyntax invocationExpression,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
             return IsContractInvocation(invocationExpression, allowedMethodNames, _contractTypeSymbol);
         }
-        
-        private static ContractMethodNames ParseContractMethodName(string methodName)
+
+        /// <summary>
+        /// Returns true if a given <paramref name="method"/> invokes member
+        /// of a System.Diagnostics.ContractsLight.Contract class.
+        /// </summary>
+        public bool IsContractInvocation(
+            IMethodSymbol method,
+            ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
-            switch (methodName)
+            return IsContractInvocation(method, allowedMethodNames, _contractTypeSymbol);
+        }
+
+        /// <summary>
+        /// Returns true if a given <paramref name="invocationExpression"/> invokes member
+        /// of a <see cref="System.Diagnostics.Contracts.Contract"/> class.
+        /// </summary>
+        public bool IsStandardContractInvocation(
+            IMethodSymbol invocationExpression,
+            ContractMethodNames allowedMethodNames = ContractMethodNames.All)
+        {
+            return IsContractInvocation(invocationExpression, allowedMethodNames, _standardContractTypeSymbol);
+        }
+
+        public static ContractMethodNames ParseContractMethodName(string? methodName)
+        {
+            return methodName switch
             {
                 // Names for both standard contract type and the lightweight one are the same.
-                case "Assert":
-                    return ContractMethodNames.Assert;
-                case "Assume":
-                    return ContractMethodNames.Assume;
-                case "EndContractBlock":
-                    return ContractMethodNames.EndContractBlock;
-                case "Ensures":
-                    return ContractMethodNames.Ensures;
-                case "EnsuresOnThrow":
-                    return ContractMethodNames.EnsuresOnThrow;
-                case "Exists":
-                    return ContractMethodNames.Exists;
-                case "ForAll":
-                    return ContractMethodNames.ForAll;
-                case "Invariant":
-                    return ContractMethodNames.Invariant;
-                case "OldValue":
-                    return ContractMethodNames.OldValue;
-                case "Requires":
-                    return ContractMethodNames.Requires;
-                case "Result":
-                    return ContractMethodNames.Result;
-                case "ValueAtReturn":
-                    return ContractMethodNames.ValueAtReturn;
-                default:
-                    return ContractMethodNames.None;
-            }
+                "Assert" => ContractMethodNames.Assert,
+                "Assume" => ContractMethodNames.Assume,
+                "EndContractBlock" => ContractMethodNames.EndContractBlock,
+                "Ensures" => ContractMethodNames.Ensures,
+                "EnsuresOnThrow" => ContractMethodNames.EnsuresOnThrow,
+                "Exists" => ContractMethodNames.Exists,
+                "ForAll" => ContractMethodNames.ForAll,
+                "Invariant" => ContractMethodNames.Invariant,
+                "OldValue" => ContractMethodNames.OldValue,
+                "Requires" => ContractMethodNames.Requires,
+                "Result" => ContractMethodNames.Result,
+                "ValueAtReturn" => ContractMethodNames.ValueAtReturn,
+                _ => ContractMethodNames.None,
+            };
         }
 
         private bool IsContractInvocation(
@@ -112,7 +121,7 @@ namespace RuntimeContracts.Analyzer.Core
             ContractMethodNames allowedMethodNames,
             INamedTypeSymbol contractTypeSymbol)
         {
-            var memberAccess =
+            MemberAccessExpressionSyntax? memberAccess =
                 invocationExpression
                 .Expression.As(x => x as MemberAccessExpressionSyntax);
 
@@ -124,6 +133,26 @@ namespace RuntimeContracts.Analyzer.Core
             var memberSymbol =
                 memberAccess
                 ?.As(x => _semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol);
+
+            // TODO: ToMetadataFullName() on every call is probably somewhat expensive
+            if (memberSymbol == null || !memberSymbol.ContainingType.Equals(contractTypeSymbol))
+            {
+                // This is not Contract.
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsContractInvocation(
+            IMethodSymbol? memberSymbol,
+            ContractMethodNames allowedMethodNames,
+            INamedTypeSymbol contractTypeSymbol)
+        {
+            if ((ParseContractMethodName(memberSymbol?.Name) & allowedMethodNames) == ContractMethodNames.None)
+            {
+                return false;
+            }
 
             // TODO: ToMetadataFullName() on every call is probably somewhat expensive
             if (memberSymbol == null || !memberSymbol.ContainingType.Equals(contractTypeSymbol))

@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using RuntimeContracts.Analyzer.Core;
+#nullable enable
 
 namespace RuntimeContracts.Analyzer
 {
