@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.1.7.0</PackageVersion>
+    <PackageVersion>0.1.8.0</PackageVersion>
     <Authors>seteplia</Authors>
     <PackageLicenseUrl>https://github.com/SergeyTeplyakov/RuntimeContracts/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
@@ -17,7 +17,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 
     <Description>RuntimeContracts</Description>
-    <PackageReleaseNotes>Moved the code to github. Added license.</PackageReleaseNotes>
+    <PackageReleaseNotes>Add support for C# non-nullable reference types.</PackageReleaseNotes>
     <Copyright>Copyright</Copyright>
     <PackageTags>RuntimeContracts, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
