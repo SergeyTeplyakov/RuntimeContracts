@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using RuntimeContracts.Analyzer.Core;
 using RuntimeContracts.Analyzer.Utilities;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -19,7 +17,7 @@ namespace RuntimeContracts.Analyzer
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RuntimeContractsAnalyzerCodeFixProvider)), Shared]
     public class UseSimplifiedNullCheckCodeFixProvider : CodeFixProvider
     {
-        private const string Title = "Use simplified null checks.";
+        private const string Title = "Use simplified null check.";
 
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UseSimplifiedNullCheckAnalyzer.DiagnosticId);
 

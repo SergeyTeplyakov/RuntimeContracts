@@ -20,7 +20,7 @@ namespace RuntimeContracts.Analyzer
         private static readonly string Title = "Use simplified null check.";
         private static readonly string Description = "Use simplified null check that the C# compiler is aware of.";
         private const string Category = "Correctness";
-        private const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
+        private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, Severity, isEnabledByDefault: true, description: Description);
 
@@ -41,7 +41,9 @@ namespace RuntimeContracts.Analyzer
             var resolver = new ContractResolver(invocation.SemanticModel);
             
             // Looking for contract methods based  on 'RuntimeContracts' package.
-            if (resolver.IsContractInvocation(invocation.TargetMethod) && !resolver.IsStandardContractInvocation(invocation.TargetMethod))
+            if (resolver.IsContractInvocation(invocation.TargetMethod) 
+                && !resolver.IsStandardContractInvocation(invocation.TargetMethod)
+                && invocation.Arguments.Length > 0)
             {
                 // Then looking for null checks.
                 var condition = invocation.Arguments[0]; // the first argument is a predicate.
@@ -50,9 +52,7 @@ namespace RuntimeContracts.Analyzer
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
                 }
-                else if (
-                    condition.Value is IUnaryOperation unary && 
-                    IsNullOrEmptyCheck(unary, out _))
+                else if (condition.Value is IUnaryOperation unary && IsNullOrEmptyCheck(unary, out _))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
                 }
