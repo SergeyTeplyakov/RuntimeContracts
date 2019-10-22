@@ -18,7 +18,7 @@ namespace RuntimeContracts.Analyzer
         private static readonly string Title = "Do not compute message programmatically for performance reasons.";
         private static readonly string Description = "String computation may be expensive and can cause perf issues when assertion is used on hot paths.";
         private const string Category = "Performance";
-        private const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
+        private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, Severity, isEnabledByDefault: true, description: Description);
 
