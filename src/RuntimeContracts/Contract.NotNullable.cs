@@ -4,8 +4,8 @@
 // 
 // --------------------------------------------------------------------
 
-using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 #nullable enable
 
@@ -13,86 +13,116 @@ namespace System.Diagnostics.ContractsLight
 {
     public partial class Contract
     {
-        private class UnreachableException : Exception { }
-
-        public static void RequiresNotNull<T>([NotNull]T? o, string? userMessage = null) where T : class
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        public static void RequiresNotNull<T>(
+            [NotNull]T? o, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0) where T : class
         {
             if (o == null)
             {
-                Requires(false, userMessage ?? "The value should not be null.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
         }
 
-        public static void RequiresNotNull<T>([NotNull]T? o, string? userMessage = null) where T : struct
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        public static void RequiresNotNull<T>(
+            [NotNull]T? o,
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0) where T : struct
         {
             if (o == null)
             {
-                Requires(false, userMessage ?? "The value should not be null.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
         }
 
-        public static void RequiresNotNullOrEmpty([NotNull]string? o, string? userMessage = null)
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        public static void RequiresNotNullOrEmpty(
+            [NotNull]string? o, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
         {
             if (string.IsNullOrEmpty(o))
             {
-                Requires(false, userMessage ?? "The value should not be null or empty.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null or empty.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
         }
 
-        public static void RequiresNotNullOrWhiteSpace([NotNull]string? o, string? userMessage = null)
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        public static void RequiresNotNullOrWhiteSpace(
+            [NotNull]string? o, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
         {
             if (string.IsNullOrWhiteSpace(o))
             {
-                Requires(false, userMessage ?? "The value should not be null or empty.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null or whitespace.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
         }
-
-        public static T AssertNotNull<T>([NotNull]T? value, string? userMessage = null) where T : class
+        
+        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+        public static void AssertNotNull<T>(
+            [NotNull]T? value, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0) where T : class
         {
             if (value == null)
             {
-                Assert(false, userMessage ?? "The value should not be null.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
-
-            return value;
         }
 
-        public static string AssertNotNullOrEmpty([NotNull]string? o, string? userMessage = null)
+        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+        public static void AssertNotNullOrEmpty(
+            [NotNull]string? o, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
         {
             if (string.IsNullOrEmpty(o))
             {
-                Assert(false, userMessage ?? "The value should not be null or empty.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null or empty.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
-
-            return o!;
         }
 
-        public static string AssertNotNullOrWhiteSpace([NotNull]string? o, string? userMessage = null)
+        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+        public static void AssertNotNullOrWhiteSpace(
+            [NotNull]string? o, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
         {
             if (string.IsNullOrWhiteSpace(o))
             {
-                Assert(false, userMessage ?? "The value should not be null or empty.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null or whitespace.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
-
-            return o!;
         }
 
-        public static T AssertNotNull<T>([NotNull]T? value, string? userMessage = null) where T : struct
+        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+        public static void AssertNotNull<T>(
+            [NotNull]T? value, 
+            string? userMessage = null,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0) where T : struct
         {
             if (value == null)
             {
-                Assert(false, userMessage ?? "The value should not be null.");
-                throw new UnreachableException();
+                userMessage ??= "The value should not be null.";
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
-
-            return value.Value;
         }
     }
 }

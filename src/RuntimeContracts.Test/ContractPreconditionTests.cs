@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define CONTRACTS_LIGHT_PRECONDITIONS
+using System;
 using System.Diagnostics.ContractsLight;
 
 using Xunit;
@@ -12,10 +13,16 @@ namespace RuntimeContracts.Test
         {
             Assert.Throws<ArgumentNullException>(() => WillFail(null));
 
-            void WillFail(string s)
+            static void WillFail(string s)
             {
                 Contract.Requires<ArgumentNullException>(s != null, "custom message");
             }
+        }
+
+        [Fact]
+        public void PreconditionsShouldFail()
+        {
+            new ContractAssertions().PreconditionFailures(true);
         }
     }
 }
