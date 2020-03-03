@@ -12,13 +12,18 @@
 
   <PropertyGroup>
     <PackageId>RuntimeContracts.Analyzer</PackageId>
-    <PackageVersion>0.1.9.4</PackageVersion>
+    <PackageVersion>0.1.10.0</PackageVersion>
     <Authors>seteplia</Authors>
     <PackageLicenseUrl>https://github.com/SergeyTeplyakov/RuntimeContracts/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Set of roslyn-based analyzers for RuntimeContracts library.</Description>
     <PackageReleaseNotes>
+0.1.10.0
+* Convert `Contract.Assume(x != null)` to `Contract.AssertNotNull(x)`.
+* Stop simplifying null-check postconditions.
+
+0.1.9.4
 * Add assertions to support not-nullable reference types.
 * Make RA003 informational by default.
 * Roll back to roslyn v. 2.10.0
