@@ -60,6 +60,13 @@ namespace RuntimeContracts.Analyzer
                 arguments = arguments.AddArguments((ArgumentSyntax)operation.Arguments[1].Syntax);
             }
 
+            var operationName = operation.TargetMethod.Name;
+            // Convert Assume to AssertNotNull
+            if (operationName == "Assume")
+            {
+                operationName = "Assert";
+            }
+
             var simplifiedContractCheck =
                 invocationExpression
                     .WithArgumentList(arguments)
@@ -67,7 +74,7 @@ namespace RuntimeContracts.Analyzer
                     .WithExpression(
                         invocationExpression
                             .Expression.As(e => (MemberAccessExpressionSyntax)e)
-                            .WithName(IdentifierName($"{operation.TargetMethod.Name}{suffix}")));
+                            .WithName(IdentifierName($"{operationName}{suffix}")));
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             root = root.ReplaceNode(invocationExpression, simplifiedContractCheck);
             return document.WithSyntaxRoot(root);

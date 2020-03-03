@@ -39,15 +39,16 @@ namespace RuntimeContracts.Analyzer
         {
             var invocation = (IInvocationOperation)context.Operation;
             var resolver = new ContractResolver(invocation.SemanticModel);
-            
+
+            var contractMethods =
+                ContractMethodNames.Assert | ContractMethodNames.Assume | ContractMethodNames.Requires;
             // Looking for contract methods based  on 'RuntimeContracts' package.
             if (resolver.IsContractInvocation(invocation.TargetMethod) 
-                && !resolver.IsStandardContractInvocation(invocation.TargetMethod)
+                && resolver.IsContractInvocation(invocation.TargetMethod, contractMethods)
                 && invocation.Arguments.Length > 0)
             {
                 // Then looking for null checks.
                 var condition = invocation.Arguments[0]; // the first argument is a predicate.
-
                 if (condition.Value is IBinaryOperation binary && IsNullCheck(binary, out _))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));

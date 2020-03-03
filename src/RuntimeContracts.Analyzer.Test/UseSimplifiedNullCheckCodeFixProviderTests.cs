@@ -139,5 +139,46 @@ namespace RuntimeContracts.Analyzer.Test
                 FixedState = { Sources = { fixedTest } },
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
+        
+        [TestMethod]
+        public async Task AssumeShouldBeTranslatedToAssert()
+        {
+            var test = @"using System.Diagnostics.ContractsLight;
+            #nullable enable
+            namespace ConsoleApplication1
+            {
+                class TypeName
+                {
+                    public string FooBar(string s)
+                    {
+                        [|Contract.Assume(s != null)|];
+                        Contract.Ensures(Contract.Result<string>() != null);
+                        return s;
+                    }
+                }
+            }";
+
+            var fixedTest = @"using System.Diagnostics.ContractsLight;
+            #nullable enable
+            namespace ConsoleApplication1
+            {
+                class TypeName
+                {
+                    public string FooBar(string s)
+                    {
+                        Contract.AssertNotNull(s);
+                        Contract.Ensures(Contract.Result<string>() != null);
+                        return s;
+                    }
+                }
+            }";
+
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+                LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp8,
+                FixedState = { Sources = { fixedTest } },
+            }.WithoutGeneratedCodeVerification().RunAsync();
+        }
     }
 }
