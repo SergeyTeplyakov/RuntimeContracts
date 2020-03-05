@@ -152,6 +152,8 @@ namespace RuntimeContracts.Analyzer.Test
                     public string FooBar(string s)
                     {
                         [|Contract.Assume(s != null)|];
+                        [|Contract.Assume(!string.IsNullOrEmpty(s))|];
+                        [|Contract.Assume(!string.IsNullOrWhiteSpace(s))|];
                         Contract.Ensures(Contract.Result<string>() != null);
                         return s;
                     }
@@ -167,6 +169,8 @@ namespace RuntimeContracts.Analyzer.Test
                     public string FooBar(string s)
                     {
                         Contract.AssertNotNull(s);
+                        Contract.AssertNotNullOrEmpty(s);
+                        Contract.AssertNotNullOrWhiteSpace(s);
                         Contract.Ensures(Contract.Result<string>() != null);
                         return s;
                     }
