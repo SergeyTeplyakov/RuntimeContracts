@@ -23,7 +23,15 @@ namespace RuntimeContracts.Analyzer.Core
         Requires = 1 << 9,
         Result = 1 << 10,
         ValueAtReturn = 1 << 11,
-        All = (1 << 12) - 1
+        RequiresNotNull = 1 << 12,
+        AssertNotNull = 1 << 13,
+        RequiresNotNullOrWhiteSpace = 1 << 14,
+        AssertNotNullOrWhiteSpace = 1 << 15,
+        RequiresNotNullOrEmpty = 1 << 16,
+        AssertNotNullOrEmpty = 1 << 17,
+        All = (1 << 18) - 1,
+        AllAsserts = Assert | AssertNotNull | AssertNotNullOrEmpty | AssertNotNullOrWhiteSpace,
+        AllRequires = Requires | RequiresNotNull | RequiresNotNullOrEmpty | RequiresNotNullOrWhiteSpace,
     }
 
     /// <summary>
@@ -101,6 +109,9 @@ namespace RuntimeContracts.Analyzer.Core
             {
                 // Names for both standard contract type and the lightweight one are the same.
                 "Assert" => ContractMethodNames.Assert,
+                "AssertNotNull" => ContractMethodNames.AssertNotNull,
+                "AssertNotNullOrEmpty" => ContractMethodNames.AssertNotNullOrEmpty,
+                "AssertNotNullOrWhiteSpace" => ContractMethodNames.AssertNotNullOrWhiteSpace,
                 "Assume" => ContractMethodNames.Assume,
                 "EndContractBlock" => ContractMethodNames.EndContractBlock,
                 "Ensures" => ContractMethodNames.Ensures,
@@ -110,6 +121,9 @@ namespace RuntimeContracts.Analyzer.Core
                 "Invariant" => ContractMethodNames.Invariant,
                 "OldValue" => ContractMethodNames.OldValue,
                 "Requires" => ContractMethodNames.Requires,
+                "RequiresNotNull" => ContractMethodNames.RequiresNotNull,
+                "RequiresNotNullOrEmpty" => ContractMethodNames.RequiresNotNullOrEmpty,
+                "RequiresNotNullOrWhiteSpace" => ContractMethodNames.RequiresNotNullOrWhiteSpace,
                 "Result" => ContractMethodNames.Result,
                 "ValueAtReturn" => ContractMethodNames.ValueAtReturn,
                 _ => ContractMethodNames.None,
