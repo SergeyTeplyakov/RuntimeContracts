@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading;
 using System.Threading.Tasks;
 using VerifyCS = RuntimeContracts.Analyzer.Test.CSharpCodeFixVerifier<
     RuntimeContracts.Analyzer.UseSimplifiedNullCheckAnalyzer,
@@ -140,6 +141,61 @@ namespace RuntimeContracts.Analyzer.Test
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
         
+
+        public async Task Main()
+        {
+
+
+            var run = Task.Run(async () =>
+            {
+                // CPU-bound operation (blocking)
+                
+                // Thread 1
+                Thread.Sleep(1000);
+                // console.WriteLine
+                // compute A
+                // Compute B
+
+                var task1 = Task.Run(() => Thread.Sleep(1000)); //
+                var task2 = Task.Run(() => Thread.Sleep(1000)); //
+                await Task.WhenAll(task1, task2);
+                
+                // IO-bound operation (non-blocking)
+                await Task.Delay(1000);
+
+                // Thread 2
+                Thread.Sleep(1000);
+
+                // 
+                await Task.Delay(1000);
+            });
+            await run;
+
+
+            var run2 = Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+            });
+
+            var delayContinuation = run2.ContinueWith(_ =>
+            {
+                Thread.Sleep(1000);
+            });
+
+            var delay2Continuation = delayContinuation.ContinueWith(_ =>
+            {
+                Thread.Sleep(1000);
+            });
+
+            await delay2Continuation;
+
+
+
+            // 
+
+        }
+
+
         [TestMethod]
         public async Task AssumeShouldBeTranslatedToAssert()
         {
