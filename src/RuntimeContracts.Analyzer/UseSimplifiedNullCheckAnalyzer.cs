@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -8,6 +7,53 @@ using RuntimeContracts.Analyzer.Core;
 
 namespace RuntimeContracts.Analyzer
 {
+    /// <summary>
+    /// An analyzer that emit a diagnostic when an assertion doesn't have a message.
+    /// </summary>
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class ProvideMessageAnalyzer : DiagnosticAnalyzer
+    {
+        public const string DiagnosticId = "RA004";
+
+        private static readonly string Title = "User-defined message is missing in a contract assertion.";
+        private static readonly string Description = "Lack of user-defined message may complicate a post-mortem analysis when the code is in flux.";
+        private const string Category = "Correctness";
+        private const DiagnosticSeverity Severity = DiagnosticSeverity.Warning;
+
+        public static readonly DiagnosticDescriptor Rule = 
+            new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, Severity, isEnabledByDefault: true, description: Description);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+
+            context.RegisterOperationAction(AnalyzeMethodInvocation, OperationKind.Invocation);
+        }
+
+        private void AnalyzeMethodInvocation(OperationAnalysisContext context)
+        {
+            var invocation = (IInvocationOperation)context.Operation;
+            var resolver = new ContractResolver(invocation.SemanticModel);
+
+            // We do care only about the following methods (and not about AssertNotNull, Invariants and Ensures)
+            var contractMethods = ContractMethodNames.Assume | ContractMethodNames.AllAsserts | ContractMethodNames.AllRequires;
+            // Looking for contract methods based  on 'RuntimeContracts' package.
+            if (resolver.IsContractInvocation(invocation.TargetMethod, contractMethods)
+                && invocation.Arguments.Length > 2)
+            {
+                // Checking that the message is not provided.
+                if (invocation.Arguments[1].IsImplicit)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// The analyzers warns on null checks like <code>Contract.Requires(arg != null)</code> and "suggest" a fix to switch to <code>Contract.RequiresNotNull(arg)</code>
     /// recognizable by the C# compiler nullability analyzers.
@@ -22,7 +68,8 @@ namespace RuntimeContracts.Analyzer
         private const string Category = "Correctness";
         private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, Severity, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = 
+            new DiagnosticDescriptor(DiagnosticId, Title, Title, Category, Severity, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -39,12 +86,10 @@ namespace RuntimeContracts.Analyzer
         {
             var invocation = (IInvocationOperation)context.Operation;
             var resolver = new ContractResolver(invocation.SemanticModel);
-
-            var contractMethods =
+            var contractsForSimplification =
                 ContractMethodNames.Assert | ContractMethodNames.Assume | ContractMethodNames.Requires;
             // Looking for contract methods based  on 'RuntimeContracts' package.
-            if (resolver.IsContractInvocation(invocation.TargetMethod) 
-                && resolver.IsContractInvocation(invocation.TargetMethod, contractMethods)
+            if (resolver.IsContractInvocation(invocation.TargetMethod, contractsForSimplification)
                 && invocation.Arguments.Length > 0)
             {
                 // Then looking for null checks.
@@ -58,6 +103,20 @@ namespace RuntimeContracts.Analyzer
                     context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation()));
                 }
             }
+
+            //var contractMethods2 = ContractMethodNames.Assume | ContractMethodNames.AllAsserts | ContractMethodNames.AllRequires;
+            //// Looking for contract methods based  on 'RuntimeContracts' package.
+            //if (resolver.IsContractInvocation(invocation.TargetMethod, contractMethods2) 
+            //    && invocation.Arguments.Length > 2)
+            //{
+            //    // Checking that the message is not provided.
+            //    if (invocation.Arguments[1].IsImplicit)
+            //    {
+            //        context.ReportDiagnostic(Diagnostic.Create(ProvideMessageAnalyzer.Rule, invocation.Syntax.GetLocation()));
+            //    }
+            //}
+            
+
         }
 
         public static bool IsNullCheck(IBinaryOperation binary, out IOperation? nullableOperand)
