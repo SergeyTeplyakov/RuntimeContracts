@@ -1,9 +1,10 @@
 ﻿#define CONTRACTS_LIGHT_PRECONDITIONS
 using System;
-using System.Diagnostics.FluentContracts;
+using System.Diagnostics.ContractsLight;
+
 using Xunit;
 
-namespace RuntimeContracts.FluentContracts.Test
+namespace RuntimeContracts.Test
 {
     public class ContractPreconditionTests
     {
@@ -14,22 +15,14 @@ namespace RuntimeContracts.FluentContracts.Test
 
             static void WillFail(string s)
             {
-                //Contract.Requires<ArgumentNullException>(s != null, "custom message");
+                Contract.Requires<ArgumentNullException>(s != null, "custom message");
             }
         }
 
         [Fact]
         public void PreconditionsShouldFail()
         {
-            someMethod(-1);
-
-            void someMethod(int arg)
-            {
-
-                Contract.Requires(arg > 0)?.IsTrue("message");
-
-                //ContractFluentExtensions.IsTrue(Contract.Requires(false), "message");
-            }
+            new ContractAssertions().PreconditionFailures(true);
         }
     }
 }
