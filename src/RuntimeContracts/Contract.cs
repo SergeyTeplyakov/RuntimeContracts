@@ -43,6 +43,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void Requires(
+            [DoesNotReturnIf(false)]
             bool condition, 
             string userMessage = null, 
             [CallerFilePath] string path = "",
@@ -69,6 +70,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void RequiresDebug(
+            [DoesNotReturnIf(false)]
             bool condition, 
             string userMessage = null, 
             [CallerFilePath] string path = "",
@@ -122,6 +124,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void Requires<TException>(
+            [DoesNotReturnIf(false)]
             bool condition,
 #if NETSTANDARD2_0
             [Localizable(false)]
@@ -150,6 +153,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void Assert(
+            [DoesNotReturnIf(false)]
             bool condition,
 #if NETSTANDARD2_0
             [Localizable(false)]
@@ -174,6 +178,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertDebug(
+            [DoesNotReturnIf(false)]
             bool condition,
 #if NETSTANDARD2_0
             [Localizable(false)]
@@ -225,6 +230,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void Assume(
+            [DoesNotReturnIf(false)]
             bool condition,
 #if NETSTANDARD2_0
             [Localizable(false)]
@@ -254,6 +260,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_INVARIANTS")]
         public static void Invariant(
+            [DoesNotReturnIf(false)]
             bool condition,
 #if NETSTANDARD2_0
             [Localizable(false)]
