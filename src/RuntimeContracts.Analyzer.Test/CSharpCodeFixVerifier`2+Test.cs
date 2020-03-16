@@ -14,6 +14,8 @@ namespace RuntimeContracts.Analyzer.Test
         {
             public Test()
             {
+                ReferenceAssemblies = AdditionalMetadataReferences.DefaultReferenceAssemblies;
+
                 SolutionTransforms.Add((solution, projectId) =>
                 {
                     var project = solution.GetProject(projectId);
@@ -22,8 +24,7 @@ namespace RuntimeContracts.Analyzer.Test
 
                     if (IncludeContracts)
                     {
-                        solution = solution.AddMetadataReference(projectId, AdditionalMetadataReferences.RuntimeContracts)
-                            .AddMetadataReference(projectId, AdditionalMetadataReferences.SystemRuntime);
+                        solution = solution.AddMetadataReference(projectId, AdditionalMetadataReferences.RuntimeContracts);
                     }
 
                     return solution;

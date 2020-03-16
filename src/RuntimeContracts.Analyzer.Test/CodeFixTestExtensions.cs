@@ -8,7 +8,7 @@ namespace RuntimeContracts.Analyzer.Test
         public static TTest WithoutGeneratedCodeVerification<TTest>(this TTest test)
             where TTest : CodeFixTest<MSTestVerifier>
         {
-            test.Exclusions &= ~AnalysisExclusions.GeneratedCode;
+            test.TestBehaviors |= TestBehaviors.SkipGeneratedCodeCheck;
             return test;
         }
     }
