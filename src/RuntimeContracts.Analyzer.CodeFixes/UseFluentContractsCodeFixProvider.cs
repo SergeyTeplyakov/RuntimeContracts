@@ -21,171 +21,49 @@ using Microsoft.CodeAnalysis.CodeStyle;
 
 namespace RuntimeContracts.Analyzer
 {
-    internal abstract class SimpleCodeAction : CodeAction
-    {
-        public SimpleCodeAction(string title, string equivalenceKey)
-        {
-            Title = title;
-            EquivalenceKey = equivalenceKey;
-        }
-
-        public sealed override string Title { get; }
-        public sealed override string EquivalenceKey { get; }
-
-        protected override Task<Document?> GetChangedDocumentAsync(CancellationToken cancellationToken)
-        {
-            return Task.FromResult<Document?>(null);
-        }
-    }
-
-    internal class SolutionChangeAction : SimpleCodeAction
-    {
-        private readonly Func<CancellationToken, Task<Solution>> _createChangedSolution;
-
-        public SolutionChangeAction(string title, Func<CancellationToken, Task<Solution>> createChangedSolution, string equivalenceKey = null)
-            : base(title, equivalenceKey)
-        {
-            _createChangedSolution = createChangedSolution;
-        }
-
-        protected override Task<Solution> GetChangedSolutionAsync(CancellationToken cancellationToken)
-        {
-            return _createChangedSolution(cancellationToken);
-        }
-    }
-
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseFluentContractsCodeFixProvider)), Shared]
     public class UseFluentContractsCodeFixProvider : CodeFixProvider
     {
-        private class FixAll : FixAllProvider
-        {
-            public static FixAll Instance { get; } = new FixAll();
-            
-            public override IEnumerable<FixAllScope> GetSupportedFixAllScopes()
-            {
-                yield return FixAllScope.Document;
-                yield return FixAllScope.Project;
-            }
-
-            public override async Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
-            {
-                var documentsAndDiagnosticsToFixMap = await FixAllContextHelper.GetDocumentDiagnosticsToFixAsync(fixAllContext);
-                
-                var updatedDocumentTasks = documentsAndDiagnosticsToFixMap.Select(
-                    kvp => FixDocumentAsync(kvp.Key, kvp.Value, fixAllContext));
-
-                await Task.WhenAll(updatedDocumentTasks).ConfigureAwait(false);
-
-                var currentSolution = fixAllContext.Solution;
-                foreach (var task in updatedDocumentTasks)
-                {
-                    // 'await' the tasks so that if any completed in a canceled manner then we'll
-                    // throw the right exception here.  Calling .Result on the tasks might end up
-                    // with AggregateExceptions being thrown instead.
-                    var updatedDocument = await task.ConfigureAwait(false);
-                    currentSolution = currentSolution.WithDocumentSyntaxRoot(
-                        updatedDocument.Id,
-                        await updatedDocument.GetSyntaxRootAsync(fixAllContext.CancellationToken).ConfigureAwait(false));
-                }
-
-                return new SolutionChangeAction(Title, _ => Task.FromResult(currentSolution));
-                //var allDiagnostics = await fixAllContext.GetAllDiagnosticsAsync(fixAllContext.Document.Project);
-                //var root = await fixAllContext.Document.GetSyntaxRootAsync(fixAllContext.CancellationToken).ConfigureAwait(false);
-
-                //List<InvocationExpressionSyntax> declarations = new List<InvocationExpressionSyntax>();
-                //foreach (var d in allDiagnostics)
-                //{
-                //    var node = root.FindNode(d.Location.SourceSpan);
-                //    // For some reason in batch mode error locations can be off.
-                //    // Using safe cast to avoid runtime failures.
-                //    if (node is InvocationExpressionSyntax declaration)
-                //    {
-                //        declarations.Add(declaration);
-                //    }
-                //    else
-                //    {
-
-                //    }
-                //    //var declaration = (InvocationExpressionSyntax)node;
-                //}
-
-                ////List<InvocationExpressionSyntax> declarations = allDiagnostics.Select(d => (InvocationExpressionSyntax)root.FindNode(d.Location.SourceSpan)).ToList();
-
-                //// Register a code action that will invoke the fix.
-                //return CodeAction.Create(
-                //    title: Title,
-                //    createChangedDocument: c => UseFluentContractsOrRemovePostconditions(fixAllContext.Document, declarations, c),
-                //    equivalenceKey: Title);
-            }
-            private async Task<Document> FixDocumentAsync(
-                Document document, ImmutableArray<Diagnostic> diagnostics, FixAllContext fixAllContext)
-            {
-                // Ensure that diagnostics for this document are always in document location
-                // order.  This provides a consistent and deterministic order for fixers
-                // that want to update a document.
-                // Also ensure that we do not pass in duplicates by invoking Distinct.
-                // See https://github.com/dotnet/roslyn/issues/31381, that seems to be causing duplicate diagnostics.
-                var filteredDiagnostics =
-                    diagnostics
-                        .Distinct()
-                        .ToList();
-                filteredDiagnostics
-                        .Sort((d1, d2) => d1.Location.SourceSpan.Start - d2.Location.SourceSpan.Start);
-
-                // PERF: Do not invoke FixAllAsync on the code fix provider if there are no diagnostics to be fixed.
-                if (filteredDiagnostics.Count == 0)
-                {
-                    return document;
-                }
-                
-                var root = await document.GetSyntaxRootAsync(fixAllContext.CancellationToken);
-                List<InvocationExpressionSyntax> declarations = filteredDiagnostics.Select(d => (InvocationExpressionSyntax)root.FindNode(d.Location.SourceSpan)).ToList();
-                return await UseFluentContractsOrRemovePostconditions(document, declarations, fixAllContext.CancellationToken);
-            }
-        }
-
         private const string Title = "Use fluent API for contract validation.";
 
+        /// <inheritdoc />
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(UseFluentContractsAnalyzer.DiagnosticId);
 
+        /// <inheritdoc />
         public sealed override FixAllProvider GetFixAllProvider()
         {
-            //return WellKnownFixAllProviders.BatchFixer;
-            //return new FixAll();
+            // Using a custom batch fixer, becuase the default one won't work.
+            // The fixer changes a shared state (replaces a using directive) and this won't
+            // allow a default fixer to run more than one fixer.
             return FixAll.Instance;
         }
 
-        public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        /// <inheritdoc />
+        public sealed override Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            //context.
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-            //System.Diagnostics.Debugger.Launch();
             var diagnostic = context.Diagnostics.First();
-
-            // Looking for contract check.
-            var declaration = (InvocationExpressionSyntax)root.FindNode(diagnostic.Location.SourceSpan);
 
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: Title,
-                    createChangedDocument: c => UseFluentContractsOrRemovePostconditions(context.Document, declaration, c),
+                    createChangedDocument: c => FixDocumentAsync(context.Document, context.Diagnostics, c),
                     equivalenceKey: Title),
                 diagnostic);
+
+            return Task.CompletedTask;
         }
 
-        private static async Task<Document> UseFluentContractsOrRemovePostconditions(
+        private static async Task<Document> UseFluentContractsOrRemovePostconditionsAsync(
             Document document, 
             List<InvocationExpressionSyntax> invocationExpressions, 
             CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var root = await document.GetSyntaxRootAsync(cancellationToken);
-            Dictionary<SyntaxNode, SyntaxNode> map = new Dictionary<SyntaxNode, SyntaxNode>();
+            var nodeTranslationMap = new Dictionary<SyntaxNode, SyntaxNode>();
 
-            //return await UseFluentContractsOrRemovePostconditions(
-            //    document, invocationExpressions[0], cancellationToken);
-
+            var nodesToRemove = new List<SyntaxNode>();
             foreach (var invocationExpression in invocationExpressions)
             {
                 var operation = (IInvocationOperation)semanticModel.GetOperation(invocationExpression);
@@ -193,22 +71,22 @@ namespace RuntimeContracts.Analyzer
 
                 if (contractResolver.GetContractInvocation(operation.TargetMethod, out var contractMethod))
                 {
-                    
                     if (contractMethod.IsPostcondition())
                     {
-                        //root = RemovePostcondition(root, operation);
+                        var nodeToRemove = operation.Syntax.Parent;
+                        nodesToRemove.Add(nodeToRemove);
                     }
                     else
                     {
                         var (source, replacement) = GetFluentContractsReplacements(root, contractResolver, operation, contractMethod);
-                        //sources.Add(source);
-                        //replacements.Add(replacement);
-                        map[source] = replacement;
+                        nodeTranslationMap[source] = replacement;
                     }
                 }
             }
 
-            root = root.ReplaceNodes(map.Keys, (source, temp) => map[source]);
+            root = root.RemoveNodes(nodesToRemove, SyntaxRemoveOptions.KeepNoTrivia);
+
+            root = root.ReplaceNodes(nodeTranslationMap.Keys, (source, temp) => nodeTranslationMap[source]);
             root = SyntaxTreeUtilities.ReplaceNamespaceUsings(root,
                 originalNamespace: FluentContractNames.OldRuntimeContractsNamespace,
                 newNamespace: FluentContractNames.FluentContractsNamespace);
@@ -216,53 +94,29 @@ namespace RuntimeContracts.Analyzer
             return document.WithSyntaxRoot(root);
         }
 
-        private static async Task<Document> UseFluentContractsOrRemovePostconditions(Document document, InvocationExpressionSyntax invocationExpression, CancellationToken cancellationToken)
+        private static async Task<Document> FixDocumentAsync(Document document, ImmutableArray<Diagnostic> diagnostics, CancellationToken token)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            // Ensure that diagnostics for this document are always in document location
+            // order.  This provides a consistent and deterministic order for fixers
+            // that want to update a document.
+            // Also ensure that we do not pass in duplicates by invoking Distinct.
+            // See https://github.com/dotnet/roslyn/issues/31381, that seems to be causing duplicate diagnostics.
+            var filteredDiagnostics =
+                diagnostics
+                    .Distinct()
+                    .ToList();
+            filteredDiagnostics
+                    .Sort((d1, d2) => d1.Location.SourceSpan.Start - d2.Location.SourceSpan.Start);
 
-            var operation = (IInvocationOperation)semanticModel.GetOperation(invocationExpression);
-            var contractResolver = new ContractResolver(semanticModel);
-
-            //var sources = new List<SyntaxNode>();
-            //var replacements = new List<SyntaxNode>();
-            Dictionary<SyntaxNode, SyntaxNode> map = new Dictionary<SyntaxNode, SyntaxNode>();
-
-            if (contractResolver.GetContractInvocation(operation.TargetMethod, out var contractMethod))
+            // PERF: Do not invoke FixAllAsync on the code fix provider if there are no diagnostics to be fixed.
+            if (filteredDiagnostics.Count == 0)
             {
-                var root = await document.GetSyntaxRootAsync(cancellationToken);
-                if (contractMethod.IsPostcondition())
-                {
-                    root = RemovePostcondition(root, operation);
-                }
-                else
-                {
-                    var (source, replacement) = GetFluentContractsReplacements(root, contractResolver, operation, contractMethod);
-                    //sources.Add(source);
-                    //replacements.Add(replacement);
-                    map[source] = replacement;
-                }
-
-                root = root.ReplaceNodes(map.Keys, (source, temp) => map[source]);
-                root = SyntaxTreeUtilities.ReplaceNamespaceUsings(root,
-                    originalNamespace: FluentContractNames.OldRuntimeContractsNamespace,
-                    newNamespace: FluentContractNames.FluentContractsNamespace);
-
-                //root = SyntaxTreeUtilities.AddNamespaceUsingsIfNeeded(root, FluentContractNames.FluentContractsNamespace);
-
-                return document.WithSyntaxRoot(root);
+                return document;
             }
 
-            return document;
-        }
-
-        private static SyntaxNode RemovePostcondition(
-            SyntaxNode root,
-            IInvocationOperation operation)
-        {
-            var invocationExpression = operation.Syntax;
-            root = root.RemoveNode(invocationExpression.Parent, SyntaxRemoveOptions.KeepNoTrivia);
-
-            return root;
+            var root = await document.GetSyntaxRootAsync(token);
+            var declarations = filteredDiagnostics.Select(d => (InvocationExpressionSyntax)root.FindNode(d.Location.SourceSpan)).ToList();
+            return await UseFluentContractsOrRemovePostconditionsAsync(document, declarations, token);
         }
 
         private static SyntaxNode UseFluentContracts(
@@ -398,18 +252,42 @@ namespace RuntimeContracts.Analyzer
                 _ => contractMethod.ToString(),
             };
         }
-    }
 
-    public static class SeparateSyntaxListExtensions
-    {
-        public static SeparatedSyntaxList<T> AddIfNotNull<T>(this SeparatedSyntaxList<T> list, T? argument) where T : SyntaxNode
+        private class FixAll : FixAllProvider
         {
-            if (argument != null)
+            public static FixAll Instance { get; } = new FixAll();
+
+            /// <inheritdoc />
+            public override IEnumerable<FixAllScope> GetSupportedFixAllScopes()
             {
-                return list.Add(argument);
+                yield return FixAllScope.Document;
+                yield return FixAllScope.Project;
             }
 
-            return list;
+            /// <inheritdoc />
+            public override async Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
+            {
+                var documentsAndDiagnosticsToFixMap = await FixAllContextHelper.GetDocumentDiagnosticsToFixAsync(fixAllContext);
+
+                var updatedDocumentTasks = documentsAndDiagnosticsToFixMap.Select(
+                    kvp => FixDocumentAsync(kvp.Key, kvp.Value, fixAllContext.CancellationToken));
+
+                await Task.WhenAll(updatedDocumentTasks).ConfigureAwait(false);
+
+                var currentSolution = fixAllContext.Solution;
+                foreach (var task in updatedDocumentTasks)
+                {
+                    // 'await' the tasks so that if any completed in a canceled manner then we'll
+                    // throw the right exception here.  Calling .Result on the tasks might end up
+                    // with AggregateExceptions being thrown instead.
+                    var updatedDocument = await task.ConfigureAwait(false);
+                    currentSolution = currentSolution.WithDocumentSyntaxRoot(
+                        updatedDocument.Id,
+                        await updatedDocument.GetSyntaxRootAsync(fixAllContext.CancellationToken).ConfigureAwait(false));
+                }
+
+                return new SolutionChangeAction(Title, _ => Task.FromResult(currentSolution));
+            }
         }
     }
 }
