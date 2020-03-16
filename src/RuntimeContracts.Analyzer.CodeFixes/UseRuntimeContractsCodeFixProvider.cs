@@ -10,8 +10,8 @@ using RuntimeContracts.Analyzer.Utilities;
 
 namespace RuntimeContracts.Analyzer
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RuntimeContractsAnalyzerCodeFixProvider)), Shared]
-    public class RuntimeContractsAnalyzerCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseRuntimeContractsCodeFixProvider)), Shared]
+    public class UseRuntimeContractsCodeFixProvider : CodeFixProvider
     {
         private const string Title = "Use System.Diagnostics.ContractsLight namespace.";
 
@@ -25,7 +25,8 @@ namespace RuntimeContracts.Analyzer
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-
+            System.Diagnostics.Debugger.Launch();
+            return;
             // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
             var diagnostic = context.Diagnostics.First();
 

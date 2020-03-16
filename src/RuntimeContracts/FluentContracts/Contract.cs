@@ -64,7 +64,40 @@ namespace System.Diagnostics.FluentContracts
             return null;
         }
 
-        /// <inheritdoc cref="ContractsLight.Contract.Requires(bool, string, string, int)"/>
+        /// <inheritdoc cref="ContractsLight.Contract.RequiresDebug(bool, string, string, int)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static PreconditionDebugFailure? RequiresDebug(
+            [DoesNotReturnIf(false)]
+            bool condition,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            if (!condition)
+            {
+                return new PreconditionDebugFailure(path, lineNumber);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Speicifes a contract such that 'predicate' returns true for each element in 'collection'.
+        /// </summary>
+        public static PreconditionForAllFailure? RequiresForAll<T>(
+            IEnumerable<T> collection,
+            Predicate<T> predicate,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            if (!CheckForAll(collection, predicate))
+            {
+                return new PreconditionForAllFailure(path, lineNumber);
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc cref="ContractsLight.Contract.Assert(bool, string, string, int)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AssertionFailure? Assert(
             [DoesNotReturnIf(false)]
@@ -78,6 +111,95 @@ namespace System.Diagnostics.FluentContracts
             }
 
             return null;
+        }
+
+        /// <inheritdoc cref="ContractsLight.Contract.AssertDebug(bool, string, string, int)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static AssertionDebugFailure? AssertDebug(
+            [DoesNotReturnIf(false)]
+            bool condition,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            if (!condition)
+            {
+                return new AssertionDebugFailure(path, lineNumber);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Speicifes a contract such that 'predicate' returns true for each element in 'collection'.
+        /// </summary>
+        public static AssertionForAllFailure? AssertForAll<T>(
+            IEnumerable<T> collection,
+            Predicate<T> predicate,
+            [CallerFilePath] string path = "",
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            if (!CheckForAll(collection, predicate))
+            {
+                return new AssertionForAllFailure(path, lineNumber);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Helper method that throws <see cref="ContractException"/> uncodintionally.
+        /// This allows e.g. <code>throw Contract.AssertFailure("Oh no!");</code>
+        /// </summary>
+        public static Exception AssertFailure(
+            // Disable localization prevents CA2204
+#if NETSTANDARD2_0
+            [Localizable(false)]
+#endif
+            string? message = null,
+            [CallerFilePath] string? path = null,
+            [CallerLineNumber] int lineNumber = 0)
+        {
+            Assert(false);
+            // This method should fail regardless of the ContractFailEvent handlers.
+            ContractRuntimeHelper.RaiseContractFailedEvent(
+                ContractFailureKind.Assert,
+                message,
+                null,
+                new Provenance(path, lineNumber),
+                out var text);
+
+            return new ContractException(ContractFailureKind.Assert, text, message, null);
+        }
+
+        /// <summary>
+        /// Returns whether the <paramref name="predicate"/> returns <c>true</c> 
+        /// for any element in the <paramref name="collection"/>.
+        /// </summary>
+        [Pure]
+        public static bool Exists<T>(IEnumerable<T> collection, Predicate<T> predicate)
+        {
+            foreach (T t in collection)
+            {
+                if (predicate(t))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CheckForAll<T>(IEnumerable<T> collection, Predicate<T> predicate)
+        {
+            foreach (T t in collection)
+            {
+                if (!predicate(t))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace RuntimeContracts.Analyzer
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DoNotUseComputedStringAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "RA002";
+        public const string DiagnosticId = DiagnosticIds.DoNotUseComputedStringId;
 
         private static readonly string Title = "Do not compute message programmatically for performance reasons.";
         private static readonly string Description = "String computation may be expensive and can cause perf issues when assertion is used on hot paths.";

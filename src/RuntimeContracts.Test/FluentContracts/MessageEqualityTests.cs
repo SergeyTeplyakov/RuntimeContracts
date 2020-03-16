@@ -40,8 +40,9 @@ namespace RuntimeContracts.Test.FluentContracts
             Assert.Equal(oldContractMessage2, newContractMessage2);
 
             // Both handlers are called for all the violations.
-            Assert.Equal(4, oldContractViolationCount);
-            Assert.Equal(4, newContractViolationCount);
+            // Can be greater than 4 because test runner runs other tests in parallel.
+            Assert.True(oldContractViolationCount >= 4, $"oldContractViolationCount== {oldContractViolationCount}");
+            Assert.True(newContractViolationCount >= 4, $"newContractViolationCount == {newContractViolationCount}");
 
             void oldContract(int n)
             {

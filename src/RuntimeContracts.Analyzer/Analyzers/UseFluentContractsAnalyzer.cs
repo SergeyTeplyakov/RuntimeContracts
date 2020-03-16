@@ -4,21 +4,23 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using RuntimeContracts.Analyzer.Core;
+using static RuntimeContracts.Analyzer.Core.ContractMethodNames;
 #nullable enable
 
 namespace RuntimeContracts.Analyzer
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class DoNotUseStandardContractAnalyzer : DiagnosticAnalyzer
+    public class UseFluentContractsAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "RA001";
+        public const string DiagnosticId = DiagnosticIds.UseFluentContractsId;
 
-        private static readonly string Title = "Do not use System.Diagnostics.Contract class.";
-        private static readonly string MessageFormat = "Do not use System.Diagnostics.Contract class.";
-        private static readonly string Description = "System.Diagnostics.Contract class can be used only with ccrewrite enabled.";
+        private static readonly string Title = "Use fluent API for preconditions/assertions.";
+        private static readonly string MessageFormat = "Use fluent API for preconditions/assertions.";
+        private static readonly string Description = "Fluent API allows constructing custom assertion messages with 0 cost at runtime.";
         private const string Category = "Correctness";
-
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+        
+        private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, Severity, isEnabledByDefault: true, description: Description);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
@@ -36,7 +38,8 @@ namespace RuntimeContracts.Analyzer
 
             var resolver = new ContractResolver(context.SemanticModel);
 
-            if (resolver.IsStandardContractInvocation(invocation))
+            if (resolver.IsContractInvocation(invocation,
+                AllAsserts | AllRequires | Assume | Ensures | EnsuresOnThrow))
             {
                 var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
 

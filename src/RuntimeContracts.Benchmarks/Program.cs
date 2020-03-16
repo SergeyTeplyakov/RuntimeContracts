@@ -134,6 +134,17 @@ namespace RuntimeContracts.Benchmarks
             }
         }
 
+        [Benchmark]
+        public void NewContractsIsCheck()
+        {
+            long count = 0;
+            for (int i = 0; i < Iterations; i++)
+            {
+                NewContractIsCheckMessage(i, this);
+                count += i;
+            }
+        }
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void OldContractMessage(int i, ContractOverheadNullCheckBenchamrk @this)
         {
@@ -143,7 +154,13 @@ namespace RuntimeContracts.Benchmarks
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void NewContractMessage(int i, ContractOverheadNullCheckBenchamrk @this)
         {
-            Contract.Requires(@this)?.NotNull($"i >= 0, i={i}");
+            Contract.Requires(@this != null)?.IsTrue($"i >= 0, i={i}");
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void NewContractIsCheckMessage(int i, ContractOverheadNullCheckBenchamrk @this)
+        {
+            Contract.Requires(@this is object)?.IsTrue($"i >= 0, i={i}");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -155,7 +172,7 @@ namespace RuntimeContracts.Benchmarks
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void NewContractStaticMessage(int i, ContractOverheadNullCheckBenchamrk @this)
         {
-            Contract.Requires(@this)?.NotNull($"i >= 0");
+            Contract.Requires(@this != null)?.IsTrue($"i >= 0");
         }
     }
 

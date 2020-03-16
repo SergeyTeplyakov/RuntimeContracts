@@ -69,6 +69,7 @@ namespace System.Diagnostics.ContractsLight
         /// </remarks>
         [Pure]
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        [Conditional("DEBUG")]
         public static void RequiresDebug(
             [DoesNotReturnIf(false)]
             bool condition, 
@@ -76,12 +77,10 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-#if DEBUG
             if (!condition)
             {
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
-#endif
         }
 
         /// <summary>

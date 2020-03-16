@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using RuntimeContracts.Analyzer.Utilities;
 
@@ -7,33 +6,6 @@ using RuntimeContracts.Analyzer.Utilities;
 
 namespace RuntimeContracts.Analyzer.Core
 {
-    [Flags]
-    public enum ContractMethodNames
-    {
-        None,
-        Assert = 1 << 0,
-        Assume = 1 << 1,
-        EndContractBlock = 1 << 2,
-        Ensures = 1 << 3,
-        EnsuresOnThrow = 1 << 4,
-        Exists = 1 << 5,
-        ForAll = 1 << 6,
-        Invariant = 1 << 7,
-        OldValue = 1 << 8,
-        Requires = 1 << 9,
-        Result = 1 << 10,
-        ValueAtReturn = 1 << 11,
-        RequiresNotNull = 1 << 12,
-        AssertNotNull = 1 << 13,
-        RequiresNotNullOrWhiteSpace = 1 << 14,
-        AssertNotNullOrWhiteSpace = 1 << 15,
-        RequiresNotNullOrEmpty = 1 << 16,
-        AssertNotNullOrEmpty = 1 << 17,
-        All = (1 << 18) - 1,
-        AllAsserts = Assert | AssertNotNull | AssertNotNullOrEmpty | AssertNotNullOrWhiteSpace,
-        AllRequires = Requires | RequiresNotNull | RequiresNotNullOrEmpty | RequiresNotNullOrWhiteSpace,
-    }
-
     /// <summary>
     /// Helper class that resolves all invocations to <code>System.Diagnostics.ContractsLight.Contract</code> class
     /// with all utilities useful to extract invocation for different method invocation.
@@ -44,6 +16,8 @@ namespace RuntimeContracts.Analyzer.Core
 
         private readonly INamedTypeSymbol _standardContractTypeSymbol;
         private readonly INamedTypeSymbol _contractTypeSymbol;
+        private readonly INamedTypeSymbol _fluentContractTypeSymbol;
+        private readonly INamedTypeSymbol _fluentContractExtensionsTypeSymbol;
 
         /// <nodoc />
         public ContractResolver(SemanticModel semanticModel)
@@ -52,12 +26,19 @@ namespace RuntimeContracts.Analyzer.Core
 
             _standardContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.Contracts.Contract");
             _contractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.ContractsLight.Contract");
+            _fluentContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentContractFullName);
+            _fluentContractExtensionsTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentExtensionsFullName);
         }
 
         /// <summary>
         /// Returns true if a given <paramref name="candidate"/> type is <code>System.Diagnostics.Contracts.Contract</code>.
         /// </summary>
         public bool IsStandardContractType(INamedTypeSymbol candidate) => candidate.Equals(_standardContractTypeSymbol);
+
+        /// <summary>
+        /// Returns true if a given <paramref name="candidate"/> type is <code>System.Diagnostics.FluentContracts.Contract</code>.
+        /// </summary>
+        public bool IsFluentContractType(INamedTypeSymbol type) => type.Equals(_fluentContractTypeSymbol);
 
         /// <summary>
         /// Returns true if a given <paramref name="invocationExpression"/> invokes member
@@ -82,6 +63,33 @@ namespace RuntimeContracts.Analyzer.Core
         }
 
         /// <summary>
+        /// Returns true if a given <paramref name="invocationExpression"/> invokes member
+        /// of a System.Diagnostics.ContractsLight.Contract class.
+        /// </summary>
+        public bool GetContractInvocation(IMethodSymbol invokedMethod, out ContractMethodNames contract)
+        {
+            contract = default;
+            if (!invokedMethod.ContainingType.Equals(_contractTypeSymbol))
+            {
+                return false;
+            }
+
+            contract = ParseContractMethodName(invokedMethod.Name);
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if a given <paramref name="invocationExpression"/> invokes member
+        /// of a System.Diagnostics.FluentContracts.Contract class.
+        /// </summary>
+        public bool IsFluentContractInvocation(
+            InvocationExpressionSyntax invocationExpression,
+            ContractMethodNames allowedMethodNames = ContractMethodNames.AllFluentContracts)
+        {
+            return IsContractInvocation(invocationExpression, allowedMethodNames, _fluentContractTypeSymbol);
+        }
+
+        /// <summary>
         /// Returns true if a given <paramref name="method"/> invokes member
         /// of a System.Diagnostics.ContractsLight.Contract class.
         /// </summary>
@@ -90,6 +98,28 @@ namespace RuntimeContracts.Analyzer.Core
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
             return IsContractInvocation(method, allowedMethodNames, _contractTypeSymbol);
+        }
+
+        /// <summary>
+        /// Returns true if a given <paramref name="method"/> invokes member
+        /// of a System.Diagnostics.FluentContracts.Contract class.
+        /// </summary>
+        public bool IsFluentContractInvocation(
+            IMethodSymbol method,
+            ContractMethodNames allowedMethodNames = ContractMethodNames.AllFluentContracts)
+        {
+            return IsContractInvocation(method, allowedMethodNames, _fluentContractTypeSymbol);
+        }
+
+        /// <summary>
+        /// Returns true if a given <paramref name="method"/> is a special extension method that forces
+        /// the contract check and throws an exception if the contract is violated.
+        /// </summary>
+        public bool IsFluentContractCheck(IMethodSymbol method)
+        {
+            return 
+                method.Name == FluentContractNames.CheckMethodName &&
+                method.ContainingType.Equals(_fluentContractExtensionsTypeSymbol);
         }
 
         /// <summary>
@@ -109,9 +139,12 @@ namespace RuntimeContracts.Analyzer.Core
             {
                 // Names for both standard contract type and the lightweight one are the same.
                 "Assert" => ContractMethodNames.Assert,
+                "AssertDebug" => ContractMethodNames.AssertDebug,
+
                 "AssertNotNull" => ContractMethodNames.AssertNotNull,
                 "AssertNotNullOrEmpty" => ContractMethodNames.AssertNotNullOrEmpty,
                 "AssertNotNullOrWhiteSpace" => ContractMethodNames.AssertNotNullOrWhiteSpace,
+
                 "Assume" => ContractMethodNames.Assume,
                 "EndContractBlock" => ContractMethodNames.EndContractBlock,
                 "Ensures" => ContractMethodNames.Ensures,
@@ -120,10 +153,15 @@ namespace RuntimeContracts.Analyzer.Core
                 "ForAll" => ContractMethodNames.ForAll,
                 "Invariant" => ContractMethodNames.Invariant,
                 "OldValue" => ContractMethodNames.OldValue,
+                
                 "Requires" => ContractMethodNames.Requires,
+                "RequiresDebug" => ContractMethodNames.RequiresDebug,
+                "RequiresForAll" => ContractMethodNames.RequiresForAll,
+
                 "RequiresNotNull" => ContractMethodNames.RequiresNotNull,
                 "RequiresNotNullOrEmpty" => ContractMethodNames.RequiresNotNullOrEmpty,
                 "RequiresNotNullOrWhiteSpace" => ContractMethodNames.RequiresNotNullOrWhiteSpace,
+
                 "Result" => ContractMethodNames.Result,
                 "ValueAtReturn" => ContractMethodNames.ValueAtReturn,
                 _ => ContractMethodNames.None,
