@@ -134,39 +134,7 @@ namespace RuntimeContracts.Analyzer.Core
         }
 
         public static ContractMethodNames ParseContractMethodName(string? methodName)
-        {
-            return methodName switch
-            {
-                // Names for both standard contract type and the lightweight one are the same.
-                "Assert" => ContractMethodNames.Assert,
-                "AssertDebug" => ContractMethodNames.AssertDebug,
-
-                "AssertNotNull" => ContractMethodNames.AssertNotNull,
-                "AssertNotNullOrEmpty" => ContractMethodNames.AssertNotNullOrEmpty,
-                "AssertNotNullOrWhiteSpace" => ContractMethodNames.AssertNotNullOrWhiteSpace,
-
-                "Assume" => ContractMethodNames.Assume,
-                "EndContractBlock" => ContractMethodNames.EndContractBlock,
-                "Ensures" => ContractMethodNames.Ensures,
-                "EnsuresOnThrow" => ContractMethodNames.EnsuresOnThrow,
-                "Exists" => ContractMethodNames.Exists,
-                "ForAll" => ContractMethodNames.ForAll,
-                "Invariant" => ContractMethodNames.Invariant,
-                "OldValue" => ContractMethodNames.OldValue,
-                
-                "Requires" => ContractMethodNames.Requires,
-                "RequiresDebug" => ContractMethodNames.RequiresDebug,
-                "RequiresForAll" => ContractMethodNames.RequiresForAll,
-
-                "RequiresNotNull" => ContractMethodNames.RequiresNotNull,
-                "RequiresNotNullOrEmpty" => ContractMethodNames.RequiresNotNullOrEmpty,
-                "RequiresNotNullOrWhiteSpace" => ContractMethodNames.RequiresNotNullOrWhiteSpace,
-
-                "Result" => ContractMethodNames.Result,
-                "ValueAtReturn" => ContractMethodNames.ValueAtReturn,
-                _ => ContractMethodNames.None,
-            };
-        }
+            => ContractMethodNamesExtensions.ParseContractMethodName(methodName);
 
         private bool IsContractInvocation(
             InvocationExpressionSyntax invocationExpression,

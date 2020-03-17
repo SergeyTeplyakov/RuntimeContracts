@@ -130,7 +130,7 @@ namespace System.Diagnostics.FluentContracts
         }
 
         /// <summary>
-        /// Speicifes a contract such that 'predicate' returns true for each element in 'collection'.
+        /// Specifies a contract such that 'predicate' returns true for each element in 'collection'.
         /// </summary>
         public static AssertionForAllFailure? AssertForAll<T>(
             IEnumerable<T> collection,
@@ -147,9 +147,10 @@ namespace System.Diagnostics.FluentContracts
         }
 
         /// <summary>
-        /// Helper method that throws <see cref="ContractException"/> uncodintionally.
-        /// This allows e.g. <code>throw Contract.AssertFailure("Oh no!");</code>
+        /// Helper method fails unconditionally.
+        /// It returns an exception to allow the usages like <code>throw Contract.AssertFailure("Oh no!");</code>
         /// </summary>
+        [DoesNotReturn]
         public static Exception AssertFailure(
             // Disable localization prevents CA2204
 #if NETSTANDARD2_0
@@ -159,7 +160,12 @@ namespace System.Diagnostics.FluentContracts
             [CallerFilePath] string? path = null,
             [CallerLineNumber] int lineNumber = 0)
         {
-            Assert(false);
+            ContractRuntimeHelper.ReportFailure(
+                ContractFailureKind.Assert,
+                message,
+                conditionTxt: null,
+                provenance: new Provenance(path, lineNumber));
+
             // This method should fail regardless of the ContractFailEvent handlers.
             ContractRuntimeHelper.RaiseContractFailedEvent(
                 ContractFailureKind.Assert,

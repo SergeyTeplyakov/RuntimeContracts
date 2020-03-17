@@ -27,6 +27,19 @@ namespace RuntimeContracts.Test
         }
 
         [Fact]
+        public void AssertFailureAlwaysFail()
+        {
+            Action a = () => WillFail(null);
+            a.ShouldThrow();
+
+            static string WillFail(string s)
+            {
+                var exception = Contract.AssertFailure("custom message");
+                return exception.Message;
+            }
+        }
+
+        [Fact]
         public void AssertionForAlFailure()
         {
             Action a = () => WillFail(new string[] { null });

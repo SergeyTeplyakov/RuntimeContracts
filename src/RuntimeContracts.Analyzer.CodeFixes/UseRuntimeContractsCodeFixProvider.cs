@@ -25,9 +25,6 @@ namespace RuntimeContracts.Analyzer
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-            System.Diagnostics.Debugger.Launch();
-            return;
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
             var diagnostic = context.Diagnostics.First();
 
             // The call to Contract.* could be a fully-qualified one or via the using statement.
@@ -37,12 +34,12 @@ namespace RuntimeContracts.Analyzer
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: Title,
-                    createChangedDocument: c => AddOrReplaceUsingsAsync(context.Document, c), 
+                    createChangedDocument: c => AddOrReplaceUsingAsync(context.Document, c), 
                     equivalenceKey: Title),
                 diagnostic);
         }
 
-        private static async Task<Document> AddOrReplaceUsingsAsync(Document document, CancellationToken cancellationToken)
+        private static async Task<Document> AddOrReplaceUsingAsync(Document document, CancellationToken cancellationToken)
         {
             var oldRoot = await document.GetSyntaxRootAsync(cancellationToken);
             return document.WithSyntaxRoot(SyntaxTreeUtilities.AddOrReplaceContractNamespaceUsings(oldRoot));

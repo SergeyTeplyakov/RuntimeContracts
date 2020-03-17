@@ -269,8 +269,12 @@ namespace RuntimeContracts.Analyzer
             {
                 var documentsAndDiagnosticsToFixMap = await FixAllContextHelper.GetDocumentDiagnosticsToFixAsync(fixAllContext);
 
-                var updatedDocumentTasks = documentsAndDiagnosticsToFixMap.Select(
-                    kvp => FixDocumentAsync(kvp.Key, kvp.Value, fixAllContext.CancellationToken));
+                var updatedDocumentTasks = 
+                    documentsAndDiagnosticsToFixMap
+                        .Where(kvp => kvp.Key != null)
+                        .Select(
+                            kvp => FixDocumentAsync(kvp.Key!, kvp.Value, fixAllContext.CancellationToken))
+                        .ToList();
 
                 await Task.WhenAll(updatedDocumentTasks).ConfigureAwait(false);
 

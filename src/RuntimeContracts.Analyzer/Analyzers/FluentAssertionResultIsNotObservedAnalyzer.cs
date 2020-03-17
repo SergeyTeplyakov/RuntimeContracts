@@ -52,7 +52,7 @@ namespace RuntimeContracts.Analyzer
             if (resolver.IsFluentContractInvocation(invocation.TargetMethod))
             {
                 var assertionKind = ContractResolver.ParseContractMethodName(invocation.TargetMethod.Name);
-                string preconditionOrAsertion =
+                string preconditionOrAssertion =
                     assertionKind == ContractMethodNames.Requires
                     ? "a precondition"
                     : "an assertion";
@@ -61,7 +61,7 @@ namespace RuntimeContracts.Analyzer
                 // a standalone Contract.Requires(x > 0); case.
                 if (invocation.Parent is IExpressionStatementOperation)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), preconditionOrAsertion));
+                    context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), preconditionOrAssertion));
                 }
                 else if (invocation.Parent is IInvocationOperation parentInvocation)
                 {
@@ -83,7 +83,7 @@ namespace RuntimeContracts.Analyzer
                     // and we should warn for all the other cases but '?.IsTrue'
                     if (!resolver.IsFluentContractCheck(operation.TargetMethod))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), preconditionOrAsertion));
+                        context.ReportDiagnostic(Diagnostic.Create(Rule, invocation.Syntax.GetLocation(), preconditionOrAssertion));
                     }
                 }
             }

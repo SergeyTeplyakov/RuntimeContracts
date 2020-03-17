@@ -10,7 +10,7 @@ namespace RuntimeContracts.Analyzer
     {
         private readonly Func<CancellationToken, Task<Solution>> _createChangedSolution;
 
-        public SolutionChangeAction(string title, Func<CancellationToken, Task<Solution>> createChangedSolution, string equivalenceKey = null)
+        public SolutionChangeAction(string title, Func<CancellationToken, Task<Solution>> createChangedSolution, string? equivalenceKey = null)
             : base(title, equivalenceKey)
         {
             _createChangedSolution = createChangedSolution;

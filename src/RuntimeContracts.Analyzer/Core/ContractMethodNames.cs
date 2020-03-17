@@ -34,8 +34,10 @@ namespace RuntimeContracts.Analyzer.Core
         RequiresDebug = 1 << 19,
         AssertForAll = 1 << 20,
         AssertDebug = 1 << 21,
+        
+        AssertFailure = 1 << 22,
 
-        All = (1 << 22) - 1,
+        All = (1 << 23) - 1,
         AllAsserts = Assert | AssertNotNull | AssertNotNullOrEmpty | AssertNotNullOrWhiteSpace | AssertDebug | AssertForAll,
         AllRequires = Requires | RequiresNotNull | RequiresNotNullOrEmpty | RequiresNotNullOrWhiteSpace | RequiresDebug | RequiresForAll,
         AllFluentContracts = Requires | RequiresDebug | RequiresForAll | Assert | AssertDebug | AssertForAll,
@@ -45,7 +47,10 @@ namespace RuntimeContracts.Analyzer.Core
     {
         public static bool IsPrecondition(this ContractMethodNames contract)
             => (contract & AllRequires) != None;
-        
+
+        public static bool IsAssertFailure(this ContractMethodNames contract)
+            => (contract & AssertFailure) != None;
+
         public static bool IsPostcondition(this ContractMethodNames contract)
             => (contract & (Ensures | EnsuresOnThrow)) != None;
 
@@ -60,5 +65,41 @@ namespace RuntimeContracts.Analyzer.Core
 
         public static bool IsForAll(this ContractMethodNames contract)
             => (contract & RequiresForAll) != None;
+
+        public static ContractMethodNames ParseContractMethodName(string? methodName)
+        {
+            return methodName switch
+            {
+                // Names for both standard contract type and the lightweight one are the same.
+                "Assert" => Assert,
+                "AssertDebug" => AssertDebug,
+                
+                "AssertNotNull" => AssertNotNull,
+                "AssertNotNullOrEmpty" => AssertNotNullOrEmpty,
+                "AssertNotNullOrWhiteSpace" => AssertNotNullOrWhiteSpace,
+                "AssertFailure" => AssertFailure,
+
+                "Assume" => Assume,
+                "EndContractBlock" => EndContractBlock,
+                "Ensures" => Ensures,
+                "EnsuresOnThrow" => EnsuresOnThrow,
+                "Exists" => Exists,
+                "ForAll" => ForAll,
+                "Invariant" => Invariant,
+                "OldValue" => OldValue,
+
+                "Requires" => Requires,
+                "RequiresDebug" => RequiresDebug,
+                "RequiresForAll" => RequiresForAll,
+
+                "RequiresNotNull" => RequiresNotNull,
+                "RequiresNotNullOrEmpty" => RequiresNotNullOrEmpty,
+                "RequiresNotNullOrWhiteSpace" => RequiresNotNullOrWhiteSpace,
+
+                "Result" => Result,
+                "ValueAtReturn" => ValueAtReturn,
+                _ => None,
+            };
+        }
     }
 }

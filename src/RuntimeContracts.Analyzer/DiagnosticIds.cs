@@ -21,5 +21,8 @@ namespace RuntimeContracts.Analyzer
 
         /// <see cref="UseFluentContractsAnalyzer"/>
         public const string UseFluentContractsId = "RA006";
+
+        /// <see cref="IncorrectUseOfAssertFailureAnalyzer"/>
+        public const string IncorrectUseOfAssertFailureId = "RA007";
     }
 }

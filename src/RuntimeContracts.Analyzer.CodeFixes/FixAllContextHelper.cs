@@ -16,7 +16,7 @@ namespace Microsoft.CodeAnalysis.CodeStyle
     /// </summary>
     internal static class FixAllContextHelper
     {
-        public static async Task<ImmutableDictionary<Document, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
+        public static async Task<ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
             FixAllContext fixAllContext)
         {
             var cancellationToken = fixAllContext.CancellationToken;
@@ -33,7 +33,7 @@ namespace Microsoft.CodeAnalysis.CodeStyle
                 if (document != null)
                 {
                     var documentDiagnostics = await fixAllContext.GetDocumentDiagnosticsAsync(document).ConfigureAwait(false);
-                    return ImmutableDictionary<Document, ImmutableArray<Diagnostic>>.Empty.SetItem(document, documentDiagnostics);
+                    return ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>.Empty.SetItem(document, documentDiagnostics);
                 }
 
                 break;
@@ -68,21 +68,21 @@ namespace Microsoft.CodeAnalysis.CodeStyle
 
             if (allDiagnostics.IsEmpty)
             {
-                return ImmutableDictionary<Document, ImmutableArray<Diagnostic>>.Empty;
+                return ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>.Empty;
             }
 
             return await GetDocumentDiagnosticsToFixAsync(
                 allDiagnostics, projectsToFix, fixAllContext.CancellationToken).ConfigureAwait(false);
         }
 
-        private static async Task<ImmutableDictionary<Document, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
+        private static async Task<ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
             ImmutableArray<Diagnostic> diagnostics,
             ImmutableArray<Project> projects,
             CancellationToken cancellationToken)
         {
             var treeToDocumentMap = await GetTreeToDocumentMapAsync(projects, cancellationToken).ConfigureAwait(false);
 
-            var builder = ImmutableDictionary.CreateBuilder<Document, ImmutableArray<Diagnostic>>();
+            var builder = ImmutableDictionary.CreateBuilder<Document?, ImmutableArray<Diagnostic>>();
             foreach (var documentAndDiagnostics in diagnostics.GroupBy(d => GetReportedDocument(d, treeToDocumentMap)))
             {
                 cancellationToken.ThrowIfCancellationRequested();
