@@ -4,22 +4,22 @@ namespace RuntimeContracts.Analyzer
 {
     public class DiagnosticIds
     {
+        /// <see cref="DoNotUseStandardContractAnalyzer" />
         public const string DoNotUseStandardContractId = "RA001";
 
-        public const string DoNotUseComputedStringId = "RA002";
+        // No longer needed when Fluent API is used
+        // public const string DoNotUseComputedStringId = "RA002";
 
-        public const string UseSimplifiedNullCheckId = "RA003";
+        // No longer needed when Fluent API is used
+        // public const string UseSimplifiedNullCheckId = "RA003";
 
+        /// <see cref="ProvideMessageAnalyzer" />
         public const string ProvideMessageId = "RA004";
 
+        /// <see cref="FluentAssertionResultIsNotObserved" />
         public const string FluentAssertionResultIsNotObserved = "RA005";
 
-        public const string FluentAssertionCanBeUsed = "RA006";
-
+        /// <see cref="UseFluentContractsAnalyzer"/>
         public const string UseFluentContractsId = "RA006";
-
-        public const string RemovePostconditionId = "RA007";
-
-        public const string UseRuntimeContractsAlias = "RA008";
     }
 }

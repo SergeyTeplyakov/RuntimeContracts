@@ -25,8 +25,7 @@ namespace System.Diagnostics.FluentContracts
         /// <summary>
         /// Generates a contract exception if a contract is violated.
         /// </summary>
-        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
-        [Conditional("DEBUG")]
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS_DEBUG")]
         public static void IsTrue(this in PreconditionDebugFailure result, string? message = null)
         {
             ContractRuntimeHelper.ReportFailure(
@@ -52,8 +51,7 @@ namespace System.Diagnostics.FluentContracts
         /// <summary>
         /// Generates a contract exception if a contract is violated.
         /// </summary>
-        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
-        [Conditional("DEBUG")]
+        [Conditional("CONTRACTS_LIGHT_ASSERTS_DEBUG")]
         public static void IsTrue(this in AssertionDebugFailure result, string? message = null)
         {
             ContractRuntimeHelper.ReportFailure(
@@ -66,8 +64,7 @@ namespace System.Diagnostics.FluentContracts
         /// <summary>
         /// Generates a contract exception if a contract is violated.
         /// </summary>
-        [Conditional("CONTRACTS_LIGHT_QUANTIFIERS")]
-        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS_FOR_ALL")]
         public static void IsTrue(this in PreconditionForAllFailure result, string? message = null)
         {
             ContractRuntimeHelper.ReportFailure(
@@ -80,8 +77,7 @@ namespace System.Diagnostics.FluentContracts
         /// <summary>
         /// Generates a contract exception if a contract is violated.
         /// </summary>
-        [Conditional("CONTRACTS_LIGHT_QUANTIFIERS")]
-        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+        [Conditional("CONTRACTS_LIGHT_ASSERTS_FOR_ALL")]
         public static void IsTrue(this in AssertionForAllFailure result, string? message = null)
         {
             ContractRuntimeHelper.ReportFailure(

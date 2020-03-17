@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 using RuntimeContracts.Analyzer.Core;
@@ -8,7 +7,7 @@ using RuntimeContracts.Analyzer.Core;
 namespace RuntimeContracts.Analyzer
 {
     /// <summary>
-    /// Analyzer that warns when the result of a method invocation is ignore (when it potentially, shouldn't).
+    /// Analyzer warns when the result of a contract check made using fluent API is not observerd.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class FluentAssertionResultIsNotObservedAnalyzer : DiagnosticAnalyzer
@@ -16,10 +15,10 @@ namespace RuntimeContracts.Analyzer
         /// <nodoc />
         public const string DiagnosticId = DiagnosticIds.FluentAssertionResultIsNotObserved;
 
-        private static readonly string Title = "The result of a contract call is not checked by calling '?.IsTrue()'.";
-        private static readonly string Message = "The result of {0} is not checked by calling '?.IsTrue()' extension method.";
+        private static readonly string Title = $"The result of a contract call is not checked by calling '?.{FluentContractNames.CheckMethodName}()'.";
+        private static readonly string Message = $"The result of {{0}} is not checked by calling '?.{{FluentContractNames.CheckMethodName}}()' extension method.";
 
-        private static readonly string Description = "Contract checks are performed in two stages and is no-op if the assertion is not followed by '?.IsTrue' call.";
+        private static readonly string Description = $"Contract checks are performed in two stages and is no-op if the assertion is not followed by '?.{FluentContractNames.CheckMethodName}' call.";
         private const string Category = "CodeSmell";
 
         private const DiagnosticSeverity Severity = DiagnosticSeverity.Error;

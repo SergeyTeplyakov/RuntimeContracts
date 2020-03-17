@@ -9,9 +9,13 @@ using static RuntimeContracts.Analyzer.Core.ContractMethodNames;
 
 namespace RuntimeContracts.Analyzer
 {
+    /// <summary>
+    /// Analyzer emits a diagnostic that allows using new fluent API.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class UseFluentContractsAnalyzer : DiagnosticAnalyzer
     {
+        /// <nodoc />
         public const string DiagnosticId = DiagnosticIds.UseFluentContractsId;
 
         private static readonly string Title = "Use fluent API for preconditions/assertions.";
@@ -22,8 +26,10 @@ namespace RuntimeContracts.Analyzer
         private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, Severity, isEnabledByDefault: true, description: Description);
 
+        /// <inheritdoc />
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
+        /// <inheritdoc />
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();

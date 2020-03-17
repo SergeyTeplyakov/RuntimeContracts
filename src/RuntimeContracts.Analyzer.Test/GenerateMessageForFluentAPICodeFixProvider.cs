@@ -7,7 +7,7 @@ using VerifyCS = RuntimeContracts.Analyzer.Test.CSharpCodeFixVerifier<
 namespace RuntimeContracts.Analyzer.Test
 {
     [TestClass]
-    public class GenerateMessageCodeFixProviderTests
+    public class GenerateMessageForFluentAPICodeFixProvider
     {
         [TestMethod]
         public async Task FixForRequires()

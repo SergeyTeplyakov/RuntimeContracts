@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageVersion>0.1.10.0</PackageVersion>
+    <PackageVersion>0.2.0.0</PackageVersion>
     <Authors>seteplia</Authors>
     <PackageLicenseUrl>https://github.com/SergeyTeplyakov/RuntimeContracts/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
@@ -18,6 +18,9 @@
 
     <Description>RuntimeContracts</Description>
     <PackageReleaseNotes>
+0.2.0.0
+Add fluent API for no-allocation assertions with custom messages.
+
 0.1.10.0
 Add DoesNotReturnIf attribute to all assertions to help with C# complier's flow analysis.
 

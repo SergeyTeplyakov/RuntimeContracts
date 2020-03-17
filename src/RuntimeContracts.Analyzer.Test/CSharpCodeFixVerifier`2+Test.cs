@@ -18,10 +18,21 @@ namespace RuntimeContracts.Analyzer.Test
                 TestState = { Sources = { test } },
                 LanguageVersion = LanguageVersion.CSharp8,
                 FixedState = { Sources = { fixedTest } },
-                NumberOfFixAllInDocumentIterations = 1,
-                NumberOfFixAllIterations = 1,
             };
             
+            return t.WithoutGeneratedCodeVerification().RunAsync();
+        }
+
+        public static Task RunBatchWithFixer(string test, string fixedCode, string batchFixedCode)
+        {
+            var t = new Test
+            {
+                TestState = { Sources = { test } },
+                LanguageVersion = LanguageVersion.CSharp8,
+                FixedCode = fixedCode,
+                BatchFixedCode = batchFixedCode,
+            };
+
             return t.WithoutGeneratedCodeVerification().RunAsync();
         }
 

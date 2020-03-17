@@ -4,6 +4,7 @@ using System.Diagnostics.FluentContracts;
 using System.Text;
 
 #nullable enable
+#pragma warning disable CS8604 // Possible null reference argument.
 
 namespace RuntimeContracts.Test.FluentContracts
 {
@@ -41,3 +42,5 @@ namespace RuntimeContracts.Test.FluentContracts
         }
     }
 }
+
+#pragma warning restore CS8604 // Possible null reference argument.

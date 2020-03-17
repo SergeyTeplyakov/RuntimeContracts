@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuntimeContracts.Analyzer.Test;
 using System.Threading.Tasks;
 using VerifyCS = RuntimeContracts.Analyzer.Test.CSharpCodeFixVerifier<
     RuntimeContracts.Analyzer.UseFluentContractsAnalyzer,
@@ -10,7 +11,7 @@ namespace RuntimeContracts.Analyzer.FluentContracts.Test
     public class UseFluentContractsCodeFixProviderTests
     {
         [TestMethod]
-        public async Task WarnWhenResultOfRequiresIsNotEnforcedByIsTrueCallBulk()
+        public async Task WarnWhenResultOfRequiresIsNotEnforcedByIsTrueCallBulkOld()
         {
             var test =
 @"using System;
@@ -40,13 +41,30 @@ namespace ConsoleApplication1
         public TypeName(string s)
         {
             Contract.Requires(s != null)?.IsTrue(""s != null"");
+            Contract.Requires(s != null);
+            Contract.Requires(s != null);
+        }
+    }
+}";
+
+            var batchFixedTest =
+@"using System;
+using System.Diagnostics.FluentContracts;
+#nullable enable
+namespace ConsoleApplication1
+{
+    class TypeName
+    {
+        public TypeName(string s)
+        {
+            Contract.Requires(s != null)?.IsTrue(""s != null"");
             Contract.Requires(s != null)?.IsTrue(""s != null"");
             Contract.Requires(s != null)?.IsTrue(""s != null"");
         }
     }
 }";
 
-            await VerifyCS.RunWithFixer(test, fixedTest);
+            await VerifyCS.RunBatchWithFixer(test, fixedTest, batchFixedTest);
         }
 
         [TestMethod]
