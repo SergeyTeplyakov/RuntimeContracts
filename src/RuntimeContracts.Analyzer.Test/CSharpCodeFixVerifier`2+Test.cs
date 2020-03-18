@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CodeFixes;
+﻿using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -10,6 +11,31 @@ namespace RuntimeContracts.Analyzer.Test
         where TAnalyzer : DiagnosticAnalyzer, new()
         where TCodeFix : CodeFixProvider, new()
     {
+        public static Task RunWithFixer(string test, string fixedTest)
+        {
+            var t = new Test
+            {
+                TestState = { Sources = { test } },
+                LanguageVersion = LanguageVersion.CSharp8,
+                FixedState = { Sources = { fixedTest } },
+            };
+            
+            return t.WithoutGeneratedCodeVerification().RunAsync();
+        }
+
+        public static Task RunBatchWithFixer(string test, string fixedCode, string batchFixedCode)
+        {
+            var t = new Test
+            {
+                TestState = { Sources = { test } },
+                LanguageVersion = LanguageVersion.CSharp8,
+                FixedCode = fixedCode,
+                BatchFixedCode = batchFixedCode,
+            };
+
+            return t.WithoutGeneratedCodeVerification().RunAsync();
+        }
+
         public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, MSTestVerifier>
         {
             public Test()

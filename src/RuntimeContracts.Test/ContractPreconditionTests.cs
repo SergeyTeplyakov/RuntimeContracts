@@ -1,10 +1,9 @@
 ﻿#define CONTRACTS_LIGHT_PRECONDITIONS
 using System;
 using System.Diagnostics.ContractsLight;
-
 using Xunit;
 
-namespace RuntimeContracts.Test
+namespace RuntimeContracts.FluentContracts.Test
 {
     public class ContractPreconditionTests
     {
@@ -22,7 +21,20 @@ namespace RuntimeContracts.Test
         [Fact]
         public void PreconditionsShouldFail()
         {
-            new ContractAssertions().PreconditionFailures(true);
+            try
+            {
+                someMethod(-1);
+                Assert.True(false, "someMethod(-1) should throw contract exception");
+            }
+            catch(Exception e) when (e.GetType().Name.Contains("ContractException"))
+            {
+
+            }
+
+            void someMethod(int arg)
+            {
+                Contract.Requires(arg > 0);
+            }
         }
     }
 }

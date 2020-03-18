@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts.Analyzer", "RuntimeContracts.Analyzer\RuntimeContracts.Analyzer.csproj", "{78DAC0D2-3455-4403-883C-C2528F896C38}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts.Test", "RuntimeContracts.Test\RuntimeContracts.Test.csproj", "{0A0BE1EE-CA65-4EB3-AC1D-267DD2C1BA2E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts.Analyzer.CodeFixes", "RuntimeContracts.Analyzer.CodeFixes\RuntimeContracts.Analyzer.CodeFixes.csproj", "{83079A2D-CA98-448F-AFC8-15EF19AEBFBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeContracts.Benchmarks", "RuntimeContracts.Benchmarks\RuntimeContracts.Benchmarks.csproj", "{AD7BD287-522B-469B-8C6D-07EB8EFD7F99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{83079A2D-CA98-448F-AFC8-15EF19AEBFBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83079A2D-CA98-448F-AFC8-15EF19AEBFBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83079A2D-CA98-448F-AFC8-15EF19AEBFBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD7BD287-522B-469B-8C6D-07EB8EFD7F99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD7BD287-522B-469B-8C6D-07EB8EFD7F99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD7BD287-522B-469B-8C6D-07EB8EFD7F99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD7BD287-522B-469B-8C6D-07EB8EFD7F99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

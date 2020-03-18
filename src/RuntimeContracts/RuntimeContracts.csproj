@@ -1,37 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard1.1</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard1.1</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="RuntimeContracts.Analyzer" Version="0.1.6" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="RuntimeContracts.Analyzer" Version="0.2.1" />
+    </ItemGroup>
 
-  <PropertyGroup>
-    <PackageVersion>0.1.10.0</PackageVersion>
-    <Authors>seteplia</Authors>
-    <PackageLicenseUrl>https://github.com/SergeyTeplyakov/RuntimeContracts/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</RepositoryUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PropertyGroup>
+        <PackageVersion>0.2.1.0</PackageVersion>
+        <Authors>seteplia</Authors>
+        <Title>Runtime Contracts</Title>
+        <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</RepositoryUrl>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Description>Lightweight runtime-only library for contract validation.</Description>
+        <PackageReleaseNotes>
+            0.2.1
+                * Add attributes for Debug and ForAll contracts to separate them from normal contracts.
+            0.2.0
+                * Add fluent API for no-allocation assertions with custom messages.
 
-    <Description>RuntimeContracts</Description>
-    <PackageReleaseNotes>
-0.1.10.0
-Add DoesNotReturnIf attribute to all assertions to help with C# complier's flow analysis.
+            0.1.10
+                * Add DoesNotReturnIf attribute to all assertions to help with C# complier's flow analysis.
 
-0.1.9.1
-* Add support for C# non-nullable reference types.
+            0.1.9.1
+            * Add support for C# non-nullable reference types.
 
-</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
-    <PackageTags>RuntimeContracts, analyzers</PackageTags>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.1.0.0</Version>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>RuntimeContracts.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
+        </PackageReleaseNotes>
+        <Copyright>Copyright</Copyright>
+        <PackageTags>RuntimeContracts, analyzers</PackageTags>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.1.0.0</Version>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>RuntimeContracts.snk</AssemblyOriginatorKeyFile>
+        <LangVersion>8.0</LangVersion>
+    </PropertyGroup>
 </Project>

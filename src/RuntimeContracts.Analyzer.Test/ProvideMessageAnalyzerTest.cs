@@ -55,5 +55,44 @@ namespace RuntimeContracts.Analyzer.Test
                 LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp8
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
+
+        [TestMethod]
+        public async Task WarnWhenNoMessageIsProvidedForFluentApi()
+        {
+            var test = @"using System.Diagnostics.FluentContracts;
+            #nullable enable
+            namespace ConsoleApplication1
+            {
+                class TypeName
+                {
+                    private string? _f;
+                    private string? Prop => _f;
+                    private string? MyFunc() => null;
+                    public TypeName(string s)
+                    {
+                        [|Contract.Requires(s != null)?.IsTrue()|];
+                        [|Contract.Requires(!string.IsNullOrEmpty(s))?.IsTrue()|];
+
+                        [|Contract.Assert(s != null && true)?.IsTrue()|];
+                        System.Diagnostics.Contracts.Contract.Requires(s != null);
+                        Contract.Assert(s != null)?.IsTrue(""Message"");
+                        string msg = string.Empty;
+                        Contract.Assert(s != null)?.IsTrue(msg);
+                        Contract.Assert(s != null)?.IsTrue($""{msg}"");
+                        
+                        string s2 = s;
+                        [|Contract.Assert(!string.IsNullOrWhiteSpace(s2))?.IsTrue()|];
+                        [|Contract.Assert(MyFunc() != null)?.IsTrue()|];
+                        [|Contract.Assert(s2 != null)?.IsTrue()|];
+                    }
+                }
+            }";
+
+            await new VerifyCS.Test
+            {
+                TestState = { Sources = { test } },
+                LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp8
+            }.WithoutGeneratedCodeVerification().RunAsync();
+        }
     }
 }

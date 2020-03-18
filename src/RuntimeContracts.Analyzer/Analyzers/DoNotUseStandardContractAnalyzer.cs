@@ -11,7 +11,7 @@ namespace RuntimeContracts.Analyzer
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DoNotUseStandardContractAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "RA001";
+        public const string DiagnosticId = DiagnosticIds.DoNotUseStandardContractId;
 
         private static readonly string Title = "Do not use System.Diagnostics.Contract class.";
         private static readonly string MessageFormat = "Do not use System.Diagnostics.Contract class.";

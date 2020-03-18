@@ -14,7 +14,7 @@ using RuntimeContracts.Analyzer.Core;
 
 namespace RuntimeContracts.Analyzer
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RuntimeContractsAnalyzerCodeFixProvider)), Shared]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseRuntimeContractsCodeFixProvider)), Shared]
     public class GenerateMessageCodeFixProvider : CodeFixProvider
     {
         private const string Title = "Generate message based on the predicate.";
@@ -34,12 +34,12 @@ namespace RuntimeContracts.Analyzer
 
             // Looking for contract check.
             var declaration = (InvocationExpressionSyntax)root.FindNode(diagnostic.Location.SourceSpan);
-            
+
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: Title,
-                    createChangedDocument: c => GenerateMessageBasedOnPredicateAsync(context.Document, declaration, c), 
+                    createChangedDocument: c => GenerateMessageBasedOnPredicateAsync(context.Document, declaration, c),
                     equivalenceKey: Title),
                 diagnostic);
         }
@@ -51,7 +51,7 @@ namespace RuntimeContracts.Analyzer
             var operation = (IInvocationOperation)semanticModel.GetOperation(invocationExpression);
 
             var arguments = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().Add((ArgumentSyntax)operation.Arguments[0].Syntax));
-            
+
             var message = operation.Arguments[0].Syntax.ToFullString();
             var contractMethod = ContractResolver.ParseContractMethodName(operation.TargetMethod.Name);
 
@@ -74,7 +74,7 @@ namespace RuntimeContracts.Analyzer
             }
 
             var predicate = LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(message));
-            
+
             arguments = arguments.AddArguments(Argument(predicate));
 
             var simplifiedContractCheck = invocationExpression.WithArgumentList(arguments);

@@ -68,7 +68,7 @@ namespace System.Diagnostics.ContractsLight
         /// Use this form when backward compatibility does not force you to throw a particular exception.
         /// </remarks>
         [Pure]
-        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS_DEBUG")]
         public static void RequiresDebug(
             [DoesNotReturnIf(false)]
             bool condition, 
@@ -76,22 +76,20 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-#if DEBUG
             if (!condition)
             {
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
-#endif
         }
 
         /// <summary>
-        /// Speicifes a contract such that 'predicate' returns true for each element in 'collection'.
+        /// Specifies a contract such that 'predicate' returns true for each element in 'collection'.
         /// </summary>
         /// <remarks>
         /// Unlike stand alone <see cref="ForAll{T}"/> this method will not cause a boxing allocation (if the collection is a value type) when the quantifiers are disabled.
         /// </remarks>
         [Pure]
-        [Conditional("CONTRACTS_LIGHT_QUANTIFIERS")]
+        [Conditional("CONTRACTS_LIGHT_PRECONDITIONS_FOR_ALL")]
         public static void RequiresForAll<T>(
             IEnumerable<T> collection, 
             Predicate<T> predicate,
@@ -99,12 +97,10 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "", 
             [CallerLineNumber] int lineNumber = 0)
         {
-#if CONTRACTS_LIGHT_PRECONDITIONS
             if (!CheckForAll(collection, predicate))
             {
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
-#endif
         }
 
         /// <summary>
@@ -176,7 +172,7 @@ namespace System.Diagnostics.ContractsLight
         /// <param name="path">Compiler generated path to the file with the assertion.</param>
         /// <param name="lineNumber">Compiler generated line number of the assertion.</param>
         [Pure]
-        [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+        [Conditional("CONTRACTS_LIGHT_ASSERTS_DEBUG")]
         public static void AssertDebug(
             [DoesNotReturnIf(false)]
             bool condition,
@@ -187,18 +183,17 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = null, 
             [CallerLineNumber] int lineNumber = 0)
         {
-#if DEBUG
             if (!condition)
             {
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
-#endif
         }
 
         /// <summary>
-        /// Helper method that throws <see cref="ContractException"/> uncodintionally.
+        /// Helper method that fails unconditionally.
         /// This allows e.g. <code>throw Contract.AssertFailure("Oh no!");</code>
         /// </summary>
+        [DoesNotReturn]
         public static Exception AssertFailure(
             // Disable localization prevents CA2204
 #if NETSTANDARD2_0
@@ -208,7 +203,8 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = null,
             [CallerLineNumber] int lineNumber = 0)
         {
-            Assert(false);
+            ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, message, null, new Provenance(path, lineNumber));
+
             // This method should fail regardless of the ContractFailEvent handlers.
             ContractRuntimeHelper.RaiseContractFailedEvent(
                 ContractFailureKind.Assert,
@@ -308,28 +304,11 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         public static bool ForAll<T>(IEnumerable<T> collection, Predicate<T> predicate)
         {
-#if CONTRACTS_LIGHT_QUANTIFIERS
             return CheckForAll(collection, predicate);
-#endif
-
-            return true;
         }
 
-#if CONTRACTS_LIGHT_PRECONDITIONS
         private static bool CheckForAll<T>(IEnumerable<T> collection, Predicate<T> predicate)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException("collection");
-            }
-
-            if (predicate == null)
-            {
-                throw new ArgumentNullException("predicate");
-            }
-
-            Contract.EndContractBlock();
-
             foreach (T t in collection)
             {
                 if (!predicate(t))
@@ -340,7 +319,6 @@ namespace System.Diagnostics.ContractsLight
 
             return true;
         }
-#endif
 
         /// <summary>
         /// Returns whether the <paramref name="predicate"/> returns <c>true</c> 
@@ -349,19 +327,6 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         public static bool Exists(int fromInclusive, int toExclusive, Predicate<int> predicate)
         {
-#if CONTRACTS_LIGHT_QUANTIFIERS
-            if (fromInclusive > toExclusive)
-            {
-                throw new ArgumentException("fromInclusive must be less than or equal to toExclusive.");
-            }
-
-            if (predicate == null)
-            {
-                throw new ArgumentNullException(nameof(predicate));
-            }
-
-            Contract.EndContractBlock();
-
             for (int i = fromInclusive; i < toExclusive; i++)
             {
                 if (predicate(i))
@@ -371,9 +336,6 @@ namespace System.Diagnostics.ContractsLight
             }
 
             return false;
-#else
-            return true;
-#endif
         }
 
         /// <summary>
@@ -383,18 +345,6 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         public static bool Exists<T>(IEnumerable<T> collection, Predicate<T> predicate)
         {
-#if CONTRACTS_LIGHT_QUANTIFIERS
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
-
-            if (predicate == null)
-            {
-                throw new ArgumentNullException(nameof(predicate));
-            }
-            Contract.EndContractBlock();
-
             foreach (T t in collection)
             {
                 if (predicate(t))
@@ -404,9 +354,6 @@ namespace System.Diagnostics.ContractsLight
             }
 
             return false;
-#else
-            return true;
-#endif
         }
     }
 }
