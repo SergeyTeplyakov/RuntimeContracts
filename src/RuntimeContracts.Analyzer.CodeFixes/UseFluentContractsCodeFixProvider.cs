@@ -47,11 +47,44 @@ namespace RuntimeContracts.Analyzer
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: Title,
-                    createChangedDocument: c => FixDocumentAsync(context.Document, context.Diagnostics, c),
+                    createChangedDocument: c =>
+                        UseFluentApiInDocumentAsync(context.Document, c),
+                        //FixDocumentAsync(context.Document, context.Diagnostics, c),
                     equivalenceKey: Title),
                 diagnostic);
 
             return Task.CompletedTask;
+        }
+
+        private class ContractFinder : CSharpSyntaxWalker
+        {
+            private readonly ContractResolver _contractResolver;
+
+            public ContractFinder(SemanticModel semanticModel) => _contractResolver = new ContractResolver(semanticModel);
+
+            public List<InvocationExpressionSyntax> ContractInvocations { get; } =
+                new List<InvocationExpressionSyntax>();
+
+            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                base.VisitInvocationExpression(node);
+
+                if (_contractResolver.IsContractInvocation(node,
+                    AllAsserts | AllRequires | Assume | Ensures | EnsuresOnThrow))
+                {
+                    ContractInvocations.Add(node);
+                }
+            }
+        }
+
+        public static async Task<Document> UseFluentApiInDocumentAsync(Document document, CancellationToken token)
+        {
+            var semanticModel = await document.GetSemanticModelAsync(token);
+            var contractFinder = new ContractFinder(semanticModel);
+            var root = await document.GetSyntaxRootAsync(token);
+            contractFinder.Visit(root);
+
+            return await UseFluentContractsOrRemovePostconditionsAsync(document, contractFinder.ContractInvocations, token);
         }
 
         private static async Task<Document> UseFluentContractsOrRemovePostconditionsAsync(
@@ -273,7 +306,9 @@ namespace RuntimeContracts.Analyzer
                     documentsAndDiagnosticsToFixMap
                         .Where(kvp => kvp.Key != null)
                         .Select(
-                            kvp => FixDocumentAsync(kvp.Key!, kvp.Value, fixAllContext.CancellationToken))
+                            kvp => 
+                                UseFluentApiInDocumentAsync(kvp.Key!, fixAllContext.CancellationToken))
+                                //FixDocumentAsync(kvp.Key!, kvp.Value, fixAllContext.CancellationToken))
                         .ToList();
 
                 await Task.WhenAll(updatedDocumentTasks).ConfigureAwait(false);

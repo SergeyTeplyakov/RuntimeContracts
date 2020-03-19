@@ -64,7 +64,7 @@ namespace ConsoleApplication1
     }
 }";
 
-            await VerifyCS.RunBatchWithFixer(test, fixedTest, batchFixedTest);
+            await VerifyCS.RunBatchWithFixer(test, batchFixedTest, batchFixedTest);
         }
 
         [TestMethod]
