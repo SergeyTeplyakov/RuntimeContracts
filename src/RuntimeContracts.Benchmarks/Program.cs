@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.FluentContracts;
+using System.Diagnostics.ContractsLight;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -70,7 +70,7 @@ namespace RuntimeContracts.Benchmarks
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void NewContractMessage(int i)
         {
-            Contract.Requires(i >= 0)?.IsTrue($"i >= 0, i={i}");
+            Contract.Check(i >= 0)?.Requires($"i >= 0, i={i}");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -82,11 +82,11 @@ namespace RuntimeContracts.Benchmarks
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void NewContractStaticMessage(int i)
         {
-            Contract.Requires(i >= 0)?.IsTrue($"i >= 0");
+            Contract.Check(i >= 0)?.Requires($"i >= 0");
         }
     }
 
-    public class ContractOverheadNullCheckBenchamrk
+    public class ContractOverheadNullCheckBenchmark
     {
         public int Iterations = 100_000;
 
@@ -146,33 +146,33 @@ namespace RuntimeContracts.Benchmarks
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void OldContractMessage(int i, ContractOverheadNullCheckBenchamrk @this)
+        private static void OldContractMessage(int i, ContractOverheadNullCheckBenchmark @this)
         {
             System.Diagnostics.ContractsLight.Contract.RequiresNotNull(@this, $"i >= 0, i={i}");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void NewContractMessage(int i, ContractOverheadNullCheckBenchamrk @this)
+        private static void NewContractMessage(int i, ContractOverheadNullCheckBenchmark @this)
         {
-            Contract.Requires(@this != null)?.IsTrue($"i >= 0, i={i}");
+            Contract.Check(@this != null)?.Requires($"i >= 0, i={i}");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void NewContractIsCheckMessage(int i, ContractOverheadNullCheckBenchamrk @this)
+        private static void NewContractIsCheckMessage(int i, ContractOverheadNullCheckBenchmark @this)
         {
-            Contract.Requires(@this is object)?.IsTrue($"i >= 0, i={i}");
+            Contract.Check(@this is object)?.Requires($"i >= 0, i={i}");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void OldContractStaticMessage(int i, ContractOverheadNullCheckBenchamrk @this)
+        private static void OldContractStaticMessage(int i, ContractOverheadNullCheckBenchmark @this)
         {
             System.Diagnostics.ContractsLight.Contract.RequiresNotNull(@this, "i >= 0");
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void NewContractStaticMessage(int i, ContractOverheadNullCheckBenchamrk @this)
+        private static void NewContractStaticMessage(int i, ContractOverheadNullCheckBenchmark @this)
         {
-            Contract.Requires(@this != null)?.IsTrue($"i >= 0");
+            Contract.Check(@this != null)?.Requires($"i >= 0");
         }
     }
 
@@ -181,7 +181,7 @@ namespace RuntimeContracts.Benchmarks
         static void Main(string[] args)
         {
             //BenchmarkRunner.Run<ContractOverheadPredicatesBenchamrk>();
-            BenchmarkRunner.Run<ContractOverheadNullCheckBenchamrk>();
+            BenchmarkRunner.Run<ContractOverheadNullCheckBenchmark>();
         }
     }
 }

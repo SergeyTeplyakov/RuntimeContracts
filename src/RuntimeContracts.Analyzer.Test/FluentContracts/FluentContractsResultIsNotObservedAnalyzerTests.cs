@@ -11,9 +11,9 @@ namespace RuntimeContracts.Analyzer.FluentContracts.Test
     public class FluentContractsResultIsNotObservedAnalyzerTests
     {
         [TestMethod]
-        public async Task WarnWhenResultOfRequiresIsNotEnforcedByIsTrueCall()
+        public async Task WarnWhenResultOfRequiresIsNotEnforcedByRequiresOrAssert()
         {
-            var test = @"using System.Diagnostics.FluentContracts;
+            var test = @"using System.Diagnostics.ContractsLight;
             #nullable enable
             namespace ConsoleApplication1
             {
@@ -21,11 +21,10 @@ namespace RuntimeContracts.Analyzer.FluentContracts.Test
                 {
                     public TypeName(string s)
                     {
-                        Contract.Requires(s != null)?.IsTrue();
+                        Contract.Check(s != null)?.Requires(s);
 
-                        [|Contract.Requires(s != null, ""Message"")|].ToString();
-                        [|Contract.Requires(s != null)|];
-                        [|Contract.Requires(s != null, ""Message"")|];
+                        [|Contract.Check(s != null)|].ToString();
+                        [|Contract.CheckDebug(s != null, ""Message"")|];
                     }
                 }
             }";
@@ -40,20 +39,20 @@ namespace RuntimeContracts.Analyzer.FluentContracts.Test
         [TestMethod]
         public async Task WarnWhenRequiresIsNotCheckedButAnotherExtensionMethodIsCalled()
         {
-            var test = @"using System.Diagnostics.FluentContracts;
+            var test = @"using System.Diagnostics.ContractsLight;
             #nullable enable
             namespace ConsoleApplication1
             {
                 public static class MyExtensions
                 {
-                    public static void MyTrue(this in PreconditionFailure result) {}
+                    public static void MyTrue(this in AssertionFailure result) {}
                 }
 
                 class TypeName
                 {
                     public TypeName(string s)
                     {
-                        [|Contract.Requires(s != null, ""Message"")|]?.MyTrue();
+                        [|Contract.Check(s != null, ""Message"")|]?.MyTrue();
                     }
                 }
             }";

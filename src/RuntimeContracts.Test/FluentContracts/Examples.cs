@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.FluentContracts;
+using System.Diagnostics.ContractsLight;
 using System.Text;
 
 #nullable enable
@@ -12,16 +12,16 @@ namespace RuntimeContracts.Test.FluentContracts
     {
         public void NullChecks(string? v1, string? v2, string? v3)
         {
-            Contract.Requires(v1 != null)?.IsTrue();
+            Contract.Check(v1 != null)?.Requires("msg");
 
             check(v1); // no warning!
 
             check(v2); // warning, v2 may be null!
 
-            Contract.Assert(v2 != null)?.IsTrue();
+            Contract.Check(v2 != null)?.Assert("msg");
             check(v2); // no warning!
 
-            Contract.Assert(!string.IsNullOrWhiteSpace(v3))?.IsTrue();
+            Contract.Check(!string.IsNullOrWhiteSpace(v3))?.Assert("msg");
             check(v3); // still a warning, unfortunately!!
 
             if (!string.IsNullOrWhiteSpace(v3))
@@ -29,7 +29,7 @@ namespace RuntimeContracts.Test.FluentContracts
                 check(v3); // still a warning!
             }
 
-            Contract.Assert(v3 != null && !string.IsNullOrWhiteSpace(v3))?.IsTrue();
+            Contract.Check(v3 != null && !string.IsNullOrWhiteSpace(v3))?.Assert("msg");
             check(v3); // no warnings!!
 
             //// This
@@ -38,7 +38,7 @@ namespace RuntimeContracts.Test.FluentContracts
             //// to ????
             //Contract.Assert(v3)?.NotNullOrWhiteSpace();
 
-            void check(string s) { }
+            static void check(string s) { }
         }
     }
 }

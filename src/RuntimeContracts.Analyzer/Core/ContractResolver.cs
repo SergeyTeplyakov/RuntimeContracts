@@ -15,8 +15,7 @@ namespace RuntimeContracts.Analyzer.Core
         private readonly SemanticModel _semanticModel;
 
         private readonly INamedTypeSymbol _standardContractTypeSymbol;
-        private readonly INamedTypeSymbol _contractTypeSymbol;
-        private readonly INamedTypeSymbol _fluentContractTypeSymbol;
+        private readonly INamedTypeSymbol _runtimeContractTypeSymbol;
         private readonly INamedTypeSymbol _fluentContractExtensionsTypeSymbol;
 
         /// <nodoc />
@@ -25,8 +24,7 @@ namespace RuntimeContracts.Analyzer.Core
             _semanticModel = semanticModel;
 
             _standardContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.Contracts.Contract");
-            _contractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.ContractsLight.Contract");
-            _fluentContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentContractFullName);
+            _runtimeContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentContractFullName);
             _fluentContractExtensionsTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentExtensionsFullName);
         }
 
@@ -34,11 +32,6 @@ namespace RuntimeContracts.Analyzer.Core
         /// Returns true if a given <paramref name="candidate"/> type is <code>System.Diagnostics.Contracts.Contract</code>.
         /// </summary>
         public bool IsStandardContractType(INamedTypeSymbol candidate) => candidate.Equals(_standardContractTypeSymbol);
-
-        /// <summary>
-        /// Returns true if a given <paramref name="candidate"/> type is <code>System.Diagnostics.FluentContracts.Contract</code>.
-        /// </summary>
-        public bool IsFluentContractType(INamedTypeSymbol type) => type.Equals(_fluentContractTypeSymbol);
 
         /// <summary>
         /// Returns true if a given <paramref name="invocationExpression"/> invokes member
@@ -59,7 +52,7 @@ namespace RuntimeContracts.Analyzer.Core
             InvocationExpressionSyntax invocationExpression,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
-            return IsContractInvocation(invocationExpression, allowedMethodNames, _contractTypeSymbol);
+            return IsContractInvocation(invocationExpression, allowedMethodNames, _runtimeContractTypeSymbol);
         }
 
         /// <summary>
@@ -69,7 +62,7 @@ namespace RuntimeContracts.Analyzer.Core
         public bool GetContractInvocation(IMethodSymbol invokedMethod, out ContractMethodNames contract)
         {
             contract = default;
-            if (!invokedMethod.ContainingType.Equals(_contractTypeSymbol))
+            if (!invokedMethod.ContainingType.Equals(_runtimeContractTypeSymbol))
             {
                 return false;
             }
@@ -86,7 +79,7 @@ namespace RuntimeContracts.Analyzer.Core
             InvocationExpressionSyntax invocationExpression,
             ContractMethodNames allowedMethodNames = ContractMethodNames.AllFluentContracts)
         {
-            return IsContractInvocation(invocationExpression, allowedMethodNames, _fluentContractTypeSymbol);
+            return IsContractInvocation(invocationExpression, allowedMethodNames, _runtimeContractTypeSymbol);
         }
 
         /// <summary>
@@ -97,7 +90,7 @@ namespace RuntimeContracts.Analyzer.Core
             IMethodSymbol method,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
-            return IsContractInvocation(method, allowedMethodNames, _contractTypeSymbol);
+            return IsContractInvocation(method, allowedMethodNames, _runtimeContractTypeSymbol);
         }
 
         /// <summary>
@@ -108,7 +101,7 @@ namespace RuntimeContracts.Analyzer.Core
             IMethodSymbol method,
             ContractMethodNames allowedMethodNames = ContractMethodNames.AllFluentContracts)
         {
-            return IsContractInvocation(method, allowedMethodNames, _fluentContractTypeSymbol);
+            return IsContractInvocation(method, allowedMethodNames, _runtimeContractTypeSymbol);
         }
 
         /// <summary>
@@ -118,7 +111,7 @@ namespace RuntimeContracts.Analyzer.Core
         public bool IsFluentContractCheck(IMethodSymbol method)
         {
             return 
-                method.Name == FluentContractNames.CheckMethodName &&
+                (method.Name == FluentContractNames.Requires || method.Name == FluentContractNames.Assert) &&
                 method.ContainingType.Equals(_fluentContractExtensionsTypeSymbol);
         }
 

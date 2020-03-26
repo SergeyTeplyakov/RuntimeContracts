@@ -2,7 +2,7 @@
 #define CONTRACTS_LIGHT_PRECONDITIONS
 
 using System;
-using System.Diagnostics.FluentContracts;
+using System.Diagnostics.ContractsLight;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -44,24 +44,24 @@ namespace RuntimeContracts.Test.FluentContracts
             Assert.True(oldContractViolationCount >= 4, $"oldContractViolationCount== {oldContractViolationCount}");
             Assert.True(newContractViolationCount >= 4, $"newContractViolationCount == {newContractViolationCount}");
 
-            void oldContract(int n)
+            static void oldContract(int n)
             {
                 System.Diagnostics.ContractsLight.Contract.Requires(n == 42);
             }
 
-            void oldContractWithMessage(int n)
+            static void oldContractWithMessage(int n)
             {
                 System.Diagnostics.ContractsLight.Contract.Requires(n == 42, "n == 42");
             }
 
-            void newContract(int n)
+            static void newContract(int n)
             {
-                Contract.Requires(n == 42)?.IsTrue();
+                Contract.Check(n == 42)?.Requires(string.Empty);
             }
 
-            void newContractWithMessage(int n)
+            static void newContractWithMessage(int n)
             {
-                Contract.Requires(n == 42)?.IsTrue("n == 42");
+                Contract.Check(n == 42)?.Requires("n == 42");
             }
         }
 
@@ -76,24 +76,24 @@ namespace RuntimeContracts.Test.FluentContracts
             var newContractMessage2 = GetContractMessage(() => newContractWithMessage(0));
             Assert.Equal(oldContractMessage2, newContractMessage2);
 
-            void oldContract(int n)
+            static void oldContract(int n)
             {
                 System.Diagnostics.ContractsLight.Contract.Assert(n == 42);
             }
 
-            void oldContractWithMessage(int n)
+            static void oldContractWithMessage(int n)
             {
                 System.Diagnostics.ContractsLight.Contract.Assert(n == 42, "n == 42");
             }
 
-            void newContract(int n)
+            static void newContract(int n)
             {
-                Contract.Assert(n == 42)?.IsTrue();
+                Contract.Check(n == 42)?.Assert(string.Empty);
             }
 
-            void newContractWithMessage(int n)
+            static void newContractWithMessage(int n)
             {
-                Contract.Assert(n == 42)?.IsTrue("n == 42");
+                Contract.Check(n == 42)?.Assert("n == 42");
             }
         }
 

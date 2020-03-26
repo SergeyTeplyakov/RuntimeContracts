@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 using RuntimeContracts.Analyzer.Core;
 using static RuntimeContracts.Analyzer.Core.ContractMethodNames;
 #nullable enable
@@ -18,9 +18,9 @@ namespace RuntimeContracts.Analyzer
         /// <nodoc />
         public const string DiagnosticId = DiagnosticIds.UseFluentContractsId;
 
-        private static readonly string Title = "Use fluent API for preconditions/assertions.";
-        private static readonly string MessageFormat = "Use fluent API for preconditions/assertions.";
-        private static readonly string Description = "Fluent API allows constructing custom assertion messages with 0 cost at runtime.";
+        private static readonly string Title = "Use fluent API for preconditions/assertions to avoid runtime overhead.";
+        private static readonly string MessageFormat = Title;
+        private static readonly string Description = "Fluent API allows constructing custom assertion messages with no allocations if contract is not violated.";
         private const string Category = "Correctness";
         
         private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
@@ -35,22 +35,61 @@ namespace RuntimeContracts.Analyzer
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.InvocationExpression);
+            context.RegisterOperationAction(AnalyzeOperation, OperationKind.Invocation);
         }
 
-        private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
+        private void AnalyzeOperation(OperationAnalysisContext context)
         {
-            var invocation = (InvocationExpressionSyntax)context.Node;
+            var invocation = (IInvocationOperation)context.Operation;
 
-            var resolver = new ContractResolver(context.SemanticModel);
+            var resolver = new ContractResolver(context.Operation.SemanticModel);
 
-            if (resolver.IsContractInvocation(invocation,
-                AllAsserts | AllRequires | Assume | Ensures | EnsuresOnThrow))
+            var contracts = AllAsserts | AllRequires | Assume | Ensures | EnsuresOnThrow;
+            
+            // Excluding ForAll and postconditions.
+            contracts &= ~(RequiresForAll | Postconditions);
+            
+            if (resolver.IsContractInvocation(invocation.TargetMethod, contracts))
             {
-                var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
-
-                context.ReportDiagnostic(diagnostic);
+                if (AssertionMessageConstructedProgrammatically(invocation))
+                {
+                    var diagnostic = Diagnostic.Create(Rule, invocation.Syntax.GetLocation());
+                    context.ReportDiagnostic(diagnostic);
+                }
             }
+        }
+
+        private static bool AssertionMessageConstructedProgrammatically(IInvocationOperation invocation)
+        {
+            var messageExpression = invocation.Arguments[1];
+            if (messageExpression.Value is ILiteralOperation)
+            {
+                return false;
+            }
+
+            // Its ok to reference a string parameter
+            if (messageExpression.Value is IParameterReferenceOperation parameterReference &&
+                parameterReference.Parameter.Type.SpecialType == SpecialType.System_String)
+            {
+                return false;
+            }
+            
+            // Or a local variable of type string
+            if (messageExpression.Value is ILocalReferenceOperation localReference &&
+                localReference.Type.SpecialType == SpecialType.System_String)
+            {
+                return false;
+            }
+
+            // This is something like: "Msg1" + "Msg2" etc
+            var valueChildren = messageExpression.Value.Children;
+
+            if (valueChildren.All(e => e is ILiteralOperation) && valueChildren.Any())
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

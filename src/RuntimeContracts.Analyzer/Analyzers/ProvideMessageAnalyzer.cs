@@ -17,7 +17,7 @@ namespace RuntimeContracts.Analyzer
 
         private static readonly string Title = "User-defined message is missing in a contract assertion.";
         private static readonly string Description = "Lack of user-defined message may complicate a post-mortem analysis when the code is in flux.";
-        private const string Category = "Correctness";
+        private const string Category = "Usability";
         private const DiagnosticSeverity Severity = DiagnosticSeverity.Info;
 
         public static readonly DiagnosticDescriptor Rule =

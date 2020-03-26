@@ -139,7 +139,7 @@ namespace System.Diagnostics.ContractsLight
             out string resultFailureMessage)
         {
             bool handled = false;
-            string returnValue;
+
             string displayMessage = "contract failed.";  // Incomplete, but in case of OOM during resource lookup...
             ContractFailedEventArgs eventArgs = null;  // In case of OOM.
             try
@@ -176,10 +176,6 @@ namespace System.Diagnostics.ContractsLight
                 if (eventArgs != null && eventArgs.Handled)
                 {
                     handled = true;
-                }
-                else
-                {
-                    returnValue = displayMessage;
                 }
             }
 
