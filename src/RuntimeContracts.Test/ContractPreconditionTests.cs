@@ -31,7 +31,7 @@ namespace RuntimeContracts.FluentContracts.Test
 
             }
 
-            void someMethod(int arg)
+            static void someMethod(int arg)
             {
                 Contract.Requires(arg > 0);
             }

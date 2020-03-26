@@ -5,11 +5,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="RuntimeContracts.Analyzer" Version="0.2.1" />
+        <PackageReference Include="RuntimeContracts.Analyzer" Version="0.3.0" />
     </ItemGroup>
 
     <PropertyGroup>
-        <PackageVersion>0.2.1.0</PackageVersion>
+        <PackageVersion>0.3.0.0</PackageVersion>
         <Authors>seteplia</Authors>
         <Title>Runtime Contracts</Title>
         <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
@@ -18,6 +18,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>Lightweight runtime-only library for contract validation.</Description>
         <PackageReleaseNotes>
+            0.3.0
+                * Add side-by-side fluent API that can be used with the existing contract checks.
             0.2.1
                 * Add attributes for Debug and ForAll contracts to separate them from normal contracts.
             0.2.0

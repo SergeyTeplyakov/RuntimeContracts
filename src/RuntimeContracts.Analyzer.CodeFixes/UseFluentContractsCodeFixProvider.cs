@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using RuntimeContracts.Analyzer.Utilities;
 using RuntimeContracts.Analyzer.Core;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -17,7 +16,7 @@ using System;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static RuntimeContracts.Analyzer.Core.ContractMethodNames;
 using System.Collections.Generic;
-using Microsoft.CodeAnalysis.CodeStyle;
+using Microsoft.CodeAnalysis.Shared.Extensions;
 
 namespace RuntimeContracts.Analyzer
 {
@@ -32,10 +31,7 @@ namespace RuntimeContracts.Analyzer
         /// <inheritdoc />
         public sealed override FixAllProvider GetFixAllProvider()
         {
-            // Using a custom batch fixer, becuase the default one won't work.
-            // The fixer changes a shared state (replaces a using directive) and this won't
-            // allow a default fixer to run more than one fixer.
-            return FixAll.Instance;
+            return WellKnownFixAllProviders.BatchFixer;
         }
 
         /// <inheritdoc />
@@ -47,7 +43,8 @@ namespace RuntimeContracts.Analyzer
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: Title,
-                    createChangedDocument: c => FixDocumentAsync(context.Document, context.Diagnostics, c),
+                    createChangedDocument: c =>
+                        FixDocumentAsync(context.Document, context.Diagnostics, c),
                     equivalenceKey: Title),
                 diagnostic);
 
@@ -63,7 +60,6 @@ namespace RuntimeContracts.Analyzer
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             var nodeTranslationMap = new Dictionary<SyntaxNode, SyntaxNode>();
 
-            var nodesToRemove = new List<SyntaxNode>();
             foreach (var invocationExpression in invocationExpressions)
             {
                 var operation = (IInvocationOperation)semanticModel.GetOperation(invocationExpression);
@@ -71,25 +67,12 @@ namespace RuntimeContracts.Analyzer
 
                 if (contractResolver.GetContractInvocation(operation.TargetMethod, out var contractMethod))
                 {
-                    if (contractMethod.IsPostcondition())
-                    {
-                        var nodeToRemove = operation.Syntax.Parent;
-                        nodesToRemove.Add(nodeToRemove);
-                    }
-                    else
-                    {
-                        var (source, replacement) = GetFluentContractsReplacements(root, contractResolver, operation, contractMethod);
-                        nodeTranslationMap[source] = replacement;
-                    }
+                    var (source, replacement) = GetFluentContractsReplacements(operation, contractMethod, semanticModel, cancellationToken);
+                    nodeTranslationMap[source] = replacement;
                 }
             }
 
-            root = root.RemoveNodes(nodesToRemove, SyntaxRemoveOptions.KeepNoTrivia);
-
             root = root.ReplaceNodes(nodeTranslationMap.Keys, (source, temp) => nodeTranslationMap[source]);
-            root = SyntaxTreeUtilities.ReplaceNamespaceUsings(root,
-                originalNamespace: FluentContractNames.OldRuntimeContractsNamespace,
-                newNamespace: FluentContractNames.FluentContractsNamespace);
 
             return document.WithSyntaxRoot(root);
         }
@@ -119,27 +102,17 @@ namespace RuntimeContracts.Analyzer
             return await UseFluentContractsOrRemovePostconditionsAsync(document, declarations, token);
         }
 
-        private static SyntaxNode UseFluentContracts(
-            SyntaxNode root,
-            ContractResolver contractResolver,
-            IInvocationOperation operation,
-            ContractMethodNames contractMethod)
-        {
-            var (source, finalNode) = GetFluentContractsReplacements(root, contractResolver, operation, contractMethod);
-            return root.ReplaceNode(source, finalNode);
-        }
-
         private static (SyntaxNode source, SyntaxNode destination) GetFluentContractsReplacements(
-            SyntaxNode root, 
-            ContractResolver contractResolver, 
             IInvocationOperation operation,
-            ContractMethodNames contractMethod)
+            ContractMethodNames contractMethod,
+            SemanticModel semanticModel,
+            CancellationToken token)
         {
             var invocationExpression = operation.Syntax;
-            var targetMethodName = GetTargetMethod(contractMethod);
 
-            // Gettng the original predicate.
-            var predicateArgument = (ArgumentSyntax)operation.Arguments[0].Syntax;
+            // Getting the original predicate.
+            var predicateArgumentOperation = operation.Arguments[0];
+            var predicateArgument = (ArgumentSyntax)predicateArgumentOperation.Syntax;
                 
             ArgumentSyntax? extraForAllArgument = null;
             int messageArgumentIndex = 1;
@@ -183,6 +156,28 @@ namespace RuntimeContracts.Analyzer
                 messageArgumentIndex++;
             }
 
+            // Detecting the following case:
+            // if (predicate is false) {Contract.Assert(false, complicatedMessage);}
+            var sourceNode = invocationExpression.Parent;
+            if (predicateArgumentOperation.Value is ILiteralOperation lo
+                && lo.ConstantValue.HasValue && lo.ConstantValue.Value.Equals(false))
+            {
+                // this is Assert(false) case.
+                if (operation.Parent?.Parent?.Parent is IConditionalOperation conditional
+                    && conditional.WhenFalse == null
+                    && conditional.WhenTrue.Children.Count() == 1)
+                {
+                    // The contract is inside the if block with a single statement.
+                    sourceNode = conditional.Syntax;
+
+                    var negatedCondition = (ExpressionSyntax?)SyntaxGeneratorExtensions.Negate(conditional.Condition.Syntax, semanticModel,  token);
+                    if (negatedCondition != null)
+                    {
+                        predicateArgument = Argument(negatedCondition);
+                    }
+                }
+            }
+
             var originalMessageArgument = operation.Arguments[messageArgumentIndex];
             Func<string> nonDefaultArgument =
                 () => contractMethod.IsForAll()
@@ -193,15 +188,18 @@ namespace RuntimeContracts.Analyzer
             // Otherwise using a predicate as the new message.
             var messageArgument =
                 originalMessageArgument.IsImplicit == false
-                ? (ArgumentSyntax)originalMessageArgument.Syntax
-                : Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nonDefaultArgument())));
+                    ? (ArgumentSyntax)originalMessageArgument.Syntax
+                    : Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nonDefaultArgument())));
 
-            var arguments = 
+            var arguments =
                 new SeparatedSyntaxList<ArgumentSyntax>()
-                .Add(predicateArgument)
-                .AddIfNotNull(extraForAllArgument);
+                    .Add(predicateArgument)
+                    .AddIfNotNull(extraForAllArgument);
 
-            // Generating Contract.ContractMethod(predicate)?.IsTrue(message)
+            // Generating Contract.Check(predicate)?.Requires/Assert(message)
+
+            var targetMethodName = GetTargetMethod(contractMethod);
+            var checkMethodName = GetCheckMethod(contractMethod);
             var contractCall =
                 ExpressionStatement(
                     ConditionalAccessExpression(
@@ -210,88 +208,43 @@ namespace RuntimeContracts.Analyzer
                             MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
                                 IdentifierName(FluentContractNames.ContractClassName),
-                                IdentifierName(targetMethodName)))
+                                IdentifierName(checkMethodName)))
                         // (predicate)
                         .WithArgumentList(
                             ArgumentList(arguments)),
                         // ?.IsTrue(message)
                         InvocationExpression(
                                     MemberBindingExpression(
-                                        IdentifierName(FluentContractNames.CheckMethodName)))
+                                        IdentifierName(targetMethodName)))
                                 .WithArgumentList(
                                     ArgumentList(
                                         SingletonSeparatedList(messageArgument)))
                                 )
                     );
 
-            var trivia = invocationExpression.Parent.GetLeadingTrivia();
+            var trivia = sourceNode.GetLeadingTrivia();
             var finalNode = contractCall.WithLeadingTrivia(trivia);
-            return (invocationExpression.Parent, finalNode);
+            return (sourceNode, finalNode);
         }
 
         private static string GetTargetMethod(ContractMethodNames contractMethod)
         {
+            if (contractMethod.IsPrecondition())
+            {
+                return FluentContractNames.Requires;
+            }
+
+            return FluentContractNames.Assert;
+        }
+        
+        private static string GetCheckMethod(ContractMethodNames contractMethod)
+        {
             return contractMethod switch
             {
-                Requires => nameof(Requires),
-                RequiresNotNull => nameof(Requires),
-                RequiresNotNullOrEmpty => nameof(Requires),
-                RequiresNotNullOrWhiteSpace => nameof(Requires),
-
-                RequiresDebug => nameof(RequiresDebug),
-
-                Assert => nameof(Assert),
-                AssertNotNull => nameof(Assert),
-                AssertNotNullOrEmpty => nameof(Assert),
-                AssertNotNullOrWhiteSpace => nameof(Assert),
-
-                AssertDebug => nameof(AssertDebug),
-
-                Assume => nameof(Assert),
-                
-                _ => contractMethod.ToString(),
+                RequiresDebug => FluentContractNames.CheckDebugMethodName,
+                AssertDebug => FluentContractNames.CheckDebugMethodName,
+                _ => FluentContractNames.CheckMethodName,
             };
-        }
-
-        private class FixAll : FixAllProvider
-        {
-            public static FixAll Instance { get; } = new FixAll();
-
-            /// <inheritdoc />
-            public override IEnumerable<FixAllScope> GetSupportedFixAllScopes()
-            {
-                yield return FixAllScope.Document;
-                yield return FixAllScope.Project;
-            }
-
-            /// <inheritdoc />
-            public override async Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
-            {
-                var documentsAndDiagnosticsToFixMap = await FixAllContextHelper.GetDocumentDiagnosticsToFixAsync(fixAllContext);
-
-                var updatedDocumentTasks = 
-                    documentsAndDiagnosticsToFixMap
-                        .Where(kvp => kvp.Key != null)
-                        .Select(
-                            kvp => FixDocumentAsync(kvp.Key!, kvp.Value, fixAllContext.CancellationToken))
-                        .ToList();
-
-                await Task.WhenAll(updatedDocumentTasks).ConfigureAwait(false);
-
-                var currentSolution = fixAllContext.Solution;
-                foreach (var task in updatedDocumentTasks)
-                {
-                    // 'await' the tasks so that if any completed in a canceled manner then we'll
-                    // throw the right exception here.  Calling .Result on the tasks might end up
-                    // with AggregateExceptions being thrown instead.
-                    var updatedDocument = await task.ConfigureAwait(false);
-                    currentSolution = currentSolution.WithDocumentSyntaxRoot(
-                        updatedDocument.Id,
-                        await updatedDocument.GetSyntaxRootAsync(fixAllContext.CancellationToken).ConfigureAwait(false));
-                }
-
-                return new SolutionChangeAction(Title, _ => Task.FromResult(currentSolution));
-            }
         }
     }
 }

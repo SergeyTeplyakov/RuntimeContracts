@@ -32,15 +32,18 @@ namespace RuntimeContracts.Analyzer.Core
 
         RequiresForAll = 1 << 18,
         RequiresDebug = 1 << 19,
-        AssertForAll = 1 << 20,
-        AssertDebug = 1 << 21,
+        AssertDebug = 1 << 20,
         
-        AssertFailure = 1 << 22,
+        AssertFailure = 1 << 21,
+        
+        Check = 1 << 22,
+        CheckDebug = 1 << 23,
 
-        All = (1 << 23) - 1,
-        AllAsserts = Assert | AssertNotNull | AssertNotNullOrEmpty | AssertNotNullOrWhiteSpace | AssertDebug | AssertForAll,
+        All = (1 << 24) - 1,
+        AllAsserts = Assert | AssertNotNull | AssertNotNullOrEmpty | AssertNotNullOrWhiteSpace | AssertDebug,
+        Postconditions = Ensures | EnsuresOnThrow,
         AllRequires = Requires | RequiresNotNull | RequiresNotNullOrEmpty | RequiresNotNullOrWhiteSpace | RequiresDebug | RequiresForAll,
-        AllFluentContracts = Requires | RequiresDebug | RequiresForAll | Assert | AssertDebug | AssertForAll,
+        AllFluentContracts = Check | CheckDebug,
     }
 
     public static class ContractMethodNamesExtensions
@@ -73,6 +76,9 @@ namespace RuntimeContracts.Analyzer.Core
                 // Names for both standard contract type and the lightweight one are the same.
                 "Assert" => Assert,
                 "AssertDebug" => AssertDebug,
+                
+                "CheckDebug" => CheckDebug,
+                "Check" => Check,
                 
                 "AssertNotNull" => AssertNotNull,
                 "AssertNotNullOrEmpty" => AssertNotNullOrEmpty,

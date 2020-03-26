@@ -5,7 +5,7 @@
 #define CONTRACTS_LIGHT_PRECONDITIONS
 #define CONTRACTS_LIGHT_PRECONDITIONS_FOR_ALL
 using System;
-using System.Diagnostics.FluentContracts;
+using System.Diagnostics.ContractsLight;
 
 using Xunit;
 
@@ -21,19 +21,7 @@ namespace RuntimeContracts.Test
 
             static void WillFail(string s)
             {
-                Contract.Requires(s != null, "custom message")?.IsTrue();
-            }
-        }
-
-        [Fact]
-        public void PreconditionForAlFailure()
-        {
-            Action a = () => WillFail(new string[] { null });
-            a.ShouldThrow();
-
-            static void WillFail(string[] args)
-            {
-                Contract.RequiresForAll(args, s => s != null, "custom message")?.IsTrue();
+                Contract.Check(s != null)?.Requires("custom message");
             }
         }
 
@@ -46,7 +34,7 @@ namespace RuntimeContracts.Test
 
             static void WillFail(string s)
             {
-                Contract.RequiresDebug(s != null, "custom message")?.IsTrue();
+                Contract.CheckDebug(s != null)?.Requires("custom message");
             }
         }
 #else
@@ -58,7 +46,7 @@ namespace RuntimeContracts.Test
 
             static void WillFail(string s)
             {
-                Contract.RequiresDebug(s != null, "custom message")?.IsTrue();
+                Contract.CheckDebug(s != null)?.Requires("custom message");
             }
         }
 #endif
