@@ -63,7 +63,7 @@ namespace RuntimeContracts.Analyzer
             foreach (var invocationExpression in invocationExpressions)
             {
                 var operation = (IInvocationOperation)semanticModel.GetOperation(invocationExpression);
-                var contractResolver = new ContractResolver(semanticModel);
+                var contractResolver = new ContractResolver(semanticModel.Compilation);
 
                 if (contractResolver.GetContractInvocation(operation.TargetMethod, out var contractMethod))
                 {

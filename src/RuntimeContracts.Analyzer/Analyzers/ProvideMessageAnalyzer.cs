@@ -28,16 +28,19 @@ namespace RuntimeContracts.Analyzer
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterOperationAction(AnalyzeMethodInvocation, OperationKind.Invocation);
+            context.RegisterCompilationStartAction(context =>
+            {
+                var resolver = new ContractResolver(context.Compilation);
+
+                context.RegisterOperationAction(context => AnalyzeMethodInvocation(context, resolver), OperationKind.Invocation);
+            });
         }
 
-        private void AnalyzeMethodInvocation(OperationAnalysisContext context)
+        private void AnalyzeMethodInvocation(OperationAnalysisContext context, ContractResolver resolver)
         {
             var invocation = (IInvocationOperation)context.Operation;
-            var resolver = new ContractResolver(invocation.SemanticModel);
 
             // We do care only about the following methods (and not about AssertNotNull, Invariants and Ensures)
             var contractMethods = ContractMethodNames.Assume | ContractMethodNames.AllAsserts | ContractMethodNames.AllRequires;

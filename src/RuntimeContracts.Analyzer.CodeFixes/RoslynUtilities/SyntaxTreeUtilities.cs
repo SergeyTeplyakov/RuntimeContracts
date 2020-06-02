@@ -13,8 +13,8 @@ namespace RuntimeContracts.Analyzer.Utilities
         public static SyntaxNode AddOrReplaceContractNamespaceUsings(SyntaxNode root)
         {
             return ReplaceNamespaceUsings(root,
-                originalNamespace: "SystemDiagnostics.Contracts",
-                newNamespace: "SystemDiagnostics.ContractsLight");
+                originalNamespace: "System.Diagnostics.Contracts",
+                newNamespace: "System.Diagnostics.ContractsLight");
         }
 
         public static SyntaxNode AddNamespaceUsingsIfNeeded(SyntaxNode root, string namespaceName)

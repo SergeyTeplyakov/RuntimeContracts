@@ -9,7 +9,7 @@ namespace RuntimeContracts.Analyzer.Test
     [TestClass]
     public class DoNotUseStandardContractAnalyzerTest
     {
-        //[TestMethod]
+        [TestMethod]
         public async Task FailsOnContractRequires()
         {
             var test = @"using System.Diagnostics.Contracts;
@@ -28,10 +28,11 @@ namespace RuntimeContracts.Analyzer.Test
             await new VerifyCS.Test
             {
                 TestState = { Sources = { test } },
+                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public async Task FixUsingOnTopLevel()
         {
             var test = @"using System;
@@ -55,7 +56,7 @@ using System.Diagnostics.Contracts;
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public async Task FixUsingInsideNamespace()
         {
             var test = @"using System;
@@ -79,7 +80,7 @@ using System.Diagnostics.Contracts;
             }.WithoutGeneratedCodeVerification().RunAsync();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public async Task FixUsingInsideSecondNamespace()
         {
             var test = @"using System;

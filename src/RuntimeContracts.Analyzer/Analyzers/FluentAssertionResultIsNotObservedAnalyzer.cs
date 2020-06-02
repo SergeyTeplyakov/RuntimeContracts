@@ -40,13 +40,17 @@ namespace RuntimeContracts.Analyzer
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterOperationAction(AnalyzeInvocationOperation, OperationKind.Invocation);
+            context.RegisterCompilationStartAction(context =>
+            {
+                var resolver = new ContractResolver(context.Compilation);
+
+                context.RegisterOperationAction(context => AnalyzeInvocationOperation(context, resolver), OperationKind.Invocation);
+            });
         }
 
-        private void AnalyzeInvocationOperation(OperationAnalysisContext context)
+        private void AnalyzeInvocationOperation(OperationAnalysisContext context, ContractResolver resolver)
         {
             var invocation = (IInvocationOperation)context.Operation;
-            var resolver = new ContractResolver(invocation.SemanticModel);
 
             // Looking for contract methods based  on 'RuntimeContracts' package.
             if (resolver.IsFluentContractInvocation(invocation.TargetMethod))
