@@ -48,7 +48,8 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-            if (string.IsNullOrEmpty(o))
+            // check for null is need to avoid a compilation warning
+            if (o == null || string.IsNullOrEmpty(o))
             {
                 userMessage ??= "The value should not be null or empty.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
@@ -62,7 +63,8 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-            if (string.IsNullOrWhiteSpace(o))
+            // check for null is need to avoid a compilation warning
+            if (o == null || string.IsNullOrWhiteSpace(o))
             {
                 userMessage ??= "The value should not be null or whitespace.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
@@ -90,7 +92,8 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-            if (string.IsNullOrEmpty(o))
+            // check for null is need to avoid a compilation warning
+            if (o == null || string.IsNullOrEmpty(o))
             {
                 userMessage ??= "The value should not be null or empty.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
@@ -104,7 +107,8 @@ namespace System.Diagnostics.ContractsLight
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
-            if (string.IsNullOrWhiteSpace(o))
+            // check for null is need to avoid a compilation warning
+            if (o == null || string.IsNullOrWhiteSpace(o))
             {
                 userMessage ??= "The value should not be null or whitespace.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
