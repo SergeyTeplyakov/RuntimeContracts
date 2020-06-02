@@ -35,14 +35,17 @@ namespace RuntimeContracts.Analyzer
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterOperationAction(AnalyzeOperation, OperationKind.Invocation);
+            context.RegisterCompilationStartAction(context =>
+            {
+                var resolver = new ContractResolver(context.Compilation);
+
+                context.RegisterOperationAction(context => AnalyzeOperation(context, resolver), OperationKind.Invocation);
+            });
         }
 
-        private void AnalyzeOperation(OperationAnalysisContext context)
+        private void AnalyzeOperation(OperationAnalysisContext context, ContractResolver resolver)
         {
             var invocation = (IInvocationOperation)context.Operation;
-
-            var resolver = new ContractResolver(context.Operation.SemanticModel);
 
             var contracts = AllAsserts | AllRequires | Assume | Ensures | EnsuresOnThrow;
             

@@ -27,16 +27,19 @@ namespace RuntimeContracts.Analyzer
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-            context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.InvocationExpression);
+            context.RegisterCompilationStartAction(context =>
+            {
+                var resolver = new ContractResolver(context.Compilation);
+
+                context.RegisterSyntaxNodeAction(context => AnalyzeSyntax(context, resolver), SyntaxKind.InvocationExpression);
+            });
         }
 
-        private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context, ContractResolver resolver)
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
 
-            var resolver = new ContractResolver(context.SemanticModel);
-
-            if (resolver.IsStandardContractInvocation(invocation))
+            if (resolver.IsStandardContractInvocation(invocation, context.SemanticModel))
             {
                 var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
 

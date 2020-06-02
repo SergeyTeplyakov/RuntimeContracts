@@ -12,20 +12,16 @@ namespace RuntimeContracts.Analyzer.Core
     /// </summary>
     public sealed class ContractResolver
     {
-        private readonly SemanticModel _semanticModel;
-
         private readonly INamedTypeSymbol _standardContractTypeSymbol;
         private readonly INamedTypeSymbol _runtimeContractTypeSymbol;
         private readonly INamedTypeSymbol _fluentContractExtensionsTypeSymbol;
 
         /// <nodoc />
-        public ContractResolver(SemanticModel semanticModel)
+        public ContractResolver(Compilation compilation)
         {
-            _semanticModel = semanticModel;
-
-            _standardContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Diagnostics.Contracts.Contract");
-            _runtimeContractTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentContractFullName);
-            _fluentContractExtensionsTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName(FluentContractNames.FluentExtensionsFullName);
+            _standardContractTypeSymbol = compilation.GetTypeByMetadataName("System.Diagnostics.Contracts.Contract");
+            _runtimeContractTypeSymbol = compilation.GetTypeByMetadataName(FluentContractNames.FluentContractFullName);
+            _fluentContractExtensionsTypeSymbol = compilation.GetTypeByMetadataName(FluentContractNames.FluentExtensionsFullName);
         }
 
         /// <summary>
@@ -39,9 +35,10 @@ namespace RuntimeContracts.Analyzer.Core
         /// </summary>
         public bool IsStandardContractInvocation(
             InvocationExpressionSyntax invocationExpression,
+            SemanticModel semanticModel,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
-            return IsContractInvocation(invocationExpression, allowedMethodNames, _standardContractTypeSymbol);
+            return IsContractInvocation(invocationExpression, semanticModel, allowedMethodNames, _standardContractTypeSymbol);
         }
 
         /// <summary>
@@ -50,9 +47,10 @@ namespace RuntimeContracts.Analyzer.Core
         /// </summary>
         public bool IsContractInvocation(
             InvocationExpressionSyntax invocationExpression,
+            SemanticModel semanticModel,
             ContractMethodNames allowedMethodNames = ContractMethodNames.All)
         {
-            return IsContractInvocation(invocationExpression, allowedMethodNames, _runtimeContractTypeSymbol);
+            return IsContractInvocation(invocationExpression, semanticModel, allowedMethodNames, _runtimeContractTypeSymbol);
         }
 
         /// <summary>
@@ -77,9 +75,10 @@ namespace RuntimeContracts.Analyzer.Core
         /// </summary>
         public bool IsFluentContractInvocation(
             InvocationExpressionSyntax invocationExpression,
+            SemanticModel semanticModel,
             ContractMethodNames allowedMethodNames = ContractMethodNames.AllFluentContracts)
         {
-            return IsContractInvocation(invocationExpression, allowedMethodNames, _runtimeContractTypeSymbol);
+            return IsContractInvocation(invocationExpression, semanticModel, allowedMethodNames, _runtimeContractTypeSymbol);
         }
 
         /// <summary>
@@ -131,6 +130,7 @@ namespace RuntimeContracts.Analyzer.Core
 
         private bool IsContractInvocation(
             InvocationExpressionSyntax invocationExpression,
+            SemanticModel semanticModel,
             ContractMethodNames allowedMethodNames,
             INamedTypeSymbol contractTypeSymbol)
         {
@@ -145,7 +145,7 @@ namespace RuntimeContracts.Analyzer.Core
 
             var memberSymbol =
                 memberAccess
-                ?.As(x => _semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol);
+                ?.As(x => semanticModel.GetSymbolInfo(x).Symbol as IMethodSymbol);
 
             // TODO: ToMetadataFullName() on every call is probably somewhat expensive
             if (memberSymbol == null || !memberSymbol.ContainingType.Equals(contractTypeSymbol))
