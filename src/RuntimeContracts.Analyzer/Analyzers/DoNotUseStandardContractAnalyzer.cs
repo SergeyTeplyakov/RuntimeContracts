@@ -1,8 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 using RuntimeContracts.Analyzer.Core;
 #nullable enable
 
@@ -31,17 +30,17 @@ namespace RuntimeContracts.Analyzer
             {
                 var resolver = new ContractResolver(context.Compilation);
 
-                context.RegisterSyntaxNodeAction(context => AnalyzeSyntax(context, resolver), SyntaxKind.InvocationExpression);
+                context.RegisterOperationAction(context => AnalyzeInvocation(context, resolver), OperationKind.Invocation);
             });
         }
 
-        private static void AnalyzeSyntax(SyntaxNodeAnalysisContext context, ContractResolver resolver)
+        private static void AnalyzeInvocation(OperationAnalysisContext context, ContractResolver resolver)
         {
-            var invocation = (InvocationExpressionSyntax)context.Node;
+            var invocation = (IInvocationOperation)context.Operation;
 
-            if (resolver.IsStandardContractInvocation(invocation, context.SemanticModel))
+            if (resolver.IsStandardContractInvocation(invocation.TargetMethod))
             {
-                var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
+                var diagnostic = Diagnostic.Create(Rule, invocation.Syntax.GetLocation());
 
                 context.ReportDiagnostic(diagnostic);
             }
