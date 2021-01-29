@@ -21,5 +21,8 @@ namespace RuntimeContracts.Analyzer
 
         /// <see cref="UseFluentContractsAnalyzer"/>
         public const string UseFluentContractsId = "RA006";
+
+        // No longer needed when Fluent API is used
+        public const string DoNotUseSimplifiedNullCheckId = "RA007";
     }
 }

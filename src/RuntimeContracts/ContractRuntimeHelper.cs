@@ -13,6 +13,7 @@ namespace System.Diagnostics.ContractsLight
     {
         // No inlining is explicit to put the method on the call stack.
         [MethodImpl(MethodImplOptions.NoInlining)]
+        [DoesNotReturn]
         public static void ReportFailure(ContractFailureKind kind, string msg, string conditionTxt, Provenance provenance)
         {
             if (!RaiseContractFailedEvent(kind, msg, conditionTxt, provenance, out var text))

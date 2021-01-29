@@ -15,7 +15,7 @@ namespace System.Diagnostics.ContractsLight
     {
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void RequiresNotNull<T>(
-            [NotNull]T? o, 
+            [NotNull]T? o,
             string? userMessage = null,
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0) where T : class
@@ -53,7 +53,9 @@ namespace System.Diagnostics.ContractsLight
                 userMessage ??= "The value should not be null or empty.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
+#pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
         }
+#pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void RequiresNotNullOrWhiteSpace(
@@ -67,8 +69,10 @@ namespace System.Diagnostics.ContractsLight
                 userMessage ??= "The value should not be null or whitespace.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
             }
+#pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
         }
-        
+#pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
+
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNull<T>(
             [NotNull]T? value, 
@@ -95,7 +99,9 @@ namespace System.Diagnostics.ContractsLight
                 userMessage ??= "The value should not be null or empty.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
+#pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
         }
+#pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNullOrWhiteSpace(
@@ -109,7 +115,9 @@ namespace System.Diagnostics.ContractsLight
                 userMessage ??= "The value should not be null or whitespace.";
                 ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
             }
+#pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
         }
+#pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNull<T>(

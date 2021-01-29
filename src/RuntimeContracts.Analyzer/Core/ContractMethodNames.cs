@@ -44,6 +44,7 @@ namespace RuntimeContracts.Analyzer.Core
         Postconditions = Ensures | EnsuresOnThrow,
         AllRequires = Requires | RequiresNotNull | RequiresNotNullOrEmpty | RequiresNotNullOrWhiteSpace | RequiresDebug | RequiresForAll,
         AllFluentContracts = Check | CheckDebug,
+        SimplifiedNullChecks = AssertNotNull | AssertNotNullOrEmpty | AssertNotNullOrWhiteSpace | RequiresNotNull | RequiresNotNullOrEmpty | RequiresNotNullOrWhiteSpace,
     }
 
     public static class ContractMethodNamesExtensions
@@ -68,7 +69,7 @@ namespace RuntimeContracts.Analyzer.Core
 
         public static bool IsForAll(this ContractMethodNames contract)
             => (contract & RequiresForAll) != None;
-
+        
         public static ContractMethodNames ParseContractMethodName(string? methodName)
         {
             return methodName switch
