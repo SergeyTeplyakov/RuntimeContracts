@@ -39,6 +39,7 @@ namespace System.Diagnostics.ContractsLight
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [DoesNotReturn]
         public static void TriggerFailure(ContractFailureKind kind, string msg, string userMessage, string conditionTxt)
         {
             throw new ContractException(kind, msg, userMessage, conditionTxt);
