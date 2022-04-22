@@ -1,26 +1,15 @@
 ﻿#define CONTRACTS_LIGHT_ASSERTS
 #define CONTRACTS_LIGHT_PRECONDITIONS
 using System;
-
+using System.Diagnostics.ContractsLight;
 using Xunit;
 
-namespace RuntimeContracts.Test
-{
-    public static class AssertionExtensions
-    {
-        public static void ShouldThrow(this Action action)
-        {
-            bool failWithContractException = false;
-            try
-            {
-                action();
-            }
-            catch (Exception e) when (e.GetType().Name == "ContractException")
-            {
-                failWithContractException = true;
-            }
+namespace RuntimeContracts.Test;
 
-            Assert.True(failWithContractException);
-        }
-    }
+public static class AssertionExtensions
+{
+    public static string ShouldThrow(this Action action) => Assert.Throws<ContractException>(action).Message;
+
+    public static string ShouldThrow<TException>(this Action action) where TException : Exception
+        => Assert.Throws<TException>(action).Message;
 }

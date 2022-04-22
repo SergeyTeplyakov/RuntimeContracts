@@ -17,6 +17,7 @@ namespace System.Diagnostics.ContractsLight
         /// </remarks>
         [Pure]
         [Conditional("CONTRACTS_LIGHT_POSTCONDITIONS")]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static void Ensures(bool condition, string userMessage = null)
         {
             // Doing nothing for now.
@@ -28,6 +29,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_POSTCONDITIONS")]
         [Conditional("CONTRACTS_LIGHT_QUANTIFIERS")]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static void EnsuresForAll<T>(IEnumerable<T> collection, Predicate<T> predicate, string userMessage = null)
         {
             // Doing nothing for now.
@@ -39,6 +41,7 @@ namespace System.Diagnostics.ContractsLight
         [Pure]
         [Conditional("CONTRACTS_LIGHT_POSTCONDITIONS")]
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Exception type used in tools.")]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static void EnsuresOnThrow<TException>(bool condition, string message = null) where TException : Exception
         {
             // Doing nothing for now.
@@ -54,6 +57,7 @@ namespace System.Diagnostics.ContractsLight
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Not intended to be called at runtime.")]
         [Pure]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static T Result<T>() { return default(T); }
 
         /// <summary>
@@ -67,6 +71,7 @@ namespace System.Diagnostics.ContractsLight
         /// </remarks>
         [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value")]
         [Pure]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static T OldValue<T>(T value) { return default(T); }
 
         /// <summary>
@@ -80,6 +85,7 @@ namespace System.Diagnostics.ContractsLight
         /// </remarks>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#", Justification = "Not intended to be called at runtime.")]
         [Pure]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static T ValueAtReturn<T>(out T value) { value = default(T); return value; }
     }
 }

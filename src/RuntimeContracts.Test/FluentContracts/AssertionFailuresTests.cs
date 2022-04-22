@@ -1,55 +1,49 @@
-﻿#if DEBUG
-#define CONTRACTS_LIGHT_ASSERTS_DEBUG
-#endif
+﻿#define CONTRACTS_LIGHT_ASSERTS_DEBUG
 
 #define CONTRACTS_LIGHT_ASSERTS
 #define CONTRACTS_LIGHT_ASSERTS_FOR_ALL
 
 using System;
 using System.Diagnostics.ContractsLight;
-
 using Xunit;
 
-namespace RuntimeContracts.Test
+namespace RuntimeContracts.Test;
+
+public class AssertionFailuresTests
 {
-    public class AssertionFailuresTests
+    [Fact]
+    public void AssertionFailure()
     {
-        [Fact]
-        public void AssertionFailure()
+        Action a = () => WillFail(null);
+        a.ShouldThrow();
+
+        static void WillFail(string s)
         {
-            Action a = () => WillFail(null);
-            a.ShouldThrow();
-
-            static void WillFail(string s)
-            {
-                Contract.Check(s != null)?.Assert("custom message");
-            }
+            Contract.Check(s != null)?.Assert("custom message");
         }
+    }
 
-#if DEBUG
-        [Fact]
-        public void AssertionDebugFailure()
+    [Fact]
+    public void AssertionDebugFailure()
+    {
+        Action a = () => WillFail(null);
+        a.ShouldThrow();
+
+        static void WillFail(string s)
         {
-            Action a = () => WillFail(null);
-            a.ShouldThrow();
-
-            static void WillFail(string s)
-            {
-                Contract.CheckDebug(s != null)?.Assert("custom message");
-            }
+            Contract.CheckDebug(s != null)?.Assert("custom message");
         }
-#else
-        [Fact]
-        public void AssertionDebugShouldNotFailInRelease()
+    }
+
+    [Fact]
+    public void AssertionDebugShouldNotFailInRelease()
+    {
+        Action a = () => WillFail(null);
+        a.ShouldThrow();
+
+        static void WillFail(string s)
         {
-            Action a = () => WillFail(null);
-            a();
-
-            static void WillFail(string s)
-            {
-                Contract.CheckDebug(s != null)?.Assert("custom message");
-            }
+            Contract.CheckDebug(s != null)?.Assert("custom message");
         }
-#endif
     }
 }

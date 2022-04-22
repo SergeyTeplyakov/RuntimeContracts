@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace RuntimeContracts.Analyzer.Utilities
+namespace RuntimeContracts.Analyzer.Utilities;
+
+public static class Monadic
 {
-    public static class Monadic
+    public static U As<T, U>(this T t, Func<T, U> convertor)
     {
-        public static U As<T, U>(this T t, Func<T, U> convertor)
-        {
-            return convertor(t);
-        }
+        return convertor(t);
     }
 }

@@ -31,10 +31,9 @@ namespace System.Diagnostics.ContractsLight
         {
             if (!RaiseContractFailedEvent(ContractFailureKind.Precondition, msg, conditionTxt, provenence, out var text))
             {
-                string fullMessage = msg + conditionTxt;
                 // TODO: need to cache the factory or maybe switch to reflection-based approach.
                 var factory = GenerateExceptionFactory<TException>();
-                throw factory(fullMessage);
+                throw factory(text);
             }
         }
 
@@ -71,7 +70,7 @@ namespace System.Diagnostics.ContractsLight
         }
 
 #else //NETSTANDARD2_0
-        public static Func<string, TException> GenerateExceptionFactory<TException>() where TException: new()
+        public static Func<string, TException> GenerateExceptionFactory<TException>() where TException : new()
         {
             return arg => new TException();
         }
@@ -185,18 +184,18 @@ namespace System.Diagnostics.ContractsLight
 
         private static string GetDisplayMessage(ContractFailureKind failureKind, string userMessage, string conditionText, Provenance provenence)
         {
-            string message = GetFailureMessage(failureKind, conditionText, provenence);
+            string message = GetFailureMessage(failureKind, conditionText);
 
             return string.IsNullOrEmpty(userMessage)
-                ? string.Format(CultureInfo.InvariantCulture, "{0}.\r\n\tat {1}", message, provenence)
-                : string.Format(CultureInfo.InvariantCulture, "{0}: {1}.\r\n\tat {2}", message, userMessage, provenence);
+                ? string.Format(CultureInfo.InvariantCulture, "{0}\r\n\tat {1}", message, provenence)
+                : string.Format(CultureInfo.InvariantCulture, "{0}: {1}\r\n\tat {2}", message, userMessage, provenence);
         }
 
-        private static string GetFailureMessage(ContractFailureKind failureKind, string conditionText, Provenance provenence)
+        private static string GetFailureMessage(ContractFailureKind failureKind, string conditionText)
         {
             return string.IsNullOrEmpty(conditionText)
                 ? string.Format(CultureInfo.InvariantCulture, "{0}", failureKind.ToDisplayString())
-                : string.Format(CultureInfo.InvariantCulture, "{0}: {1}", failureKind.ToDisplayString(), conditionText);
+                : string.Format(CultureInfo.InvariantCulture, "{0} ({1})", failureKind.ToDisplayString(), conditionText);
         }
     }
 }

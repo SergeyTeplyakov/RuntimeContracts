@@ -3,14 +3,13 @@ using System.Diagnostics.ContractsLight;
 
 using Xunit;
 
-namespace RuntimeContracts.Test
+namespace RuntimeContracts.Test;
+
+public class ContractAssertTests
 {
-    public class ContractAssertTests
+    [Fact]
+    public void PreconditionsShouldFail()
     {
-        [Fact]
-        public void PreconditionsShouldFail()
-        {
-            new ContractAssertions().AssertionFailures(true);
-        }
+        new ContractAssertions().AssertionFailures(true);
     }
 }

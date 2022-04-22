@@ -6,7 +6,7 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>10.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -78,7 +78,7 @@
     <ItemGroup>
         <!-- Analyzer packages should not have any dependencies. -->
         <PackageReference Update="@(PackageReference)" PrivateAssets="all" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.10.0" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
         <ProjectReference Update="@(ProjectReference)" PrivateAssets="all" />
     </ItemGroup>
 

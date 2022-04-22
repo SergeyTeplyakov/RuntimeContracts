@@ -45,13 +45,14 @@ namespace System.Diagnostics.ContractsLight
         public static void Requires(
             [DoesNotReturnIf(false)]
             bool condition, 
-            string userMessage = null, 
+            string userMessage = null,
+            [CallerArgumentExpression("condition")] string conditionText = "",
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
             if (!condition)
             {
-                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, conditionText, new Provenance(path, lineNumber));
             }
         }
         
@@ -72,13 +73,14 @@ namespace System.Diagnostics.ContractsLight
         public static void RequiresDebug(
             [DoesNotReturnIf(false)]
             bool condition, 
-            string userMessage = null, 
+            string userMessage = null,
+            [CallerArgumentExpression("condition")] string conditionText = "",
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
             if (!condition)
             {
-                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, null, new Provenance(path, lineNumber));
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, conditionText, new Provenance(path, lineNumber));
             }
         }
 
@@ -126,6 +128,7 @@ namespace System.Diagnostics.ContractsLight
             [Localizable(false)]
 #endif
             string userMessage = null,
+            [CallerArgumentExpression("condition")] string conditionText = "",
             [CallerFilePath] string path = "", 
             [CallerLineNumber] int lineNumber = 0) where TException : Exception
 #if !NETSTANDARD2_0
@@ -135,7 +138,7 @@ namespace System.Diagnostics.ContractsLight
         {
             if (!condition)
             {
-                ContractRuntimeHelper.ReportPreconditionFailure<TException>(userMessage, null, new Provenance(path, lineNumber));
+                ContractRuntimeHelper.ReportPreconditionFailure<TException>(userMessage, conditionText, new Provenance(path, lineNumber));
             }
         }
 
@@ -155,12 +158,13 @@ namespace System.Diagnostics.ContractsLight
             [Localizable(false)]
 #endif
             string userMessage = null,
+            [CallerArgumentExpression("condition")] string conditionText = "",
             [CallerFilePath] string path = null, 
             [CallerLineNumber] int lineNumber = 0)
         {
             if (!condition)
             {
-                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path, lineNumber));
             }
         }
         
@@ -180,12 +184,13 @@ namespace System.Diagnostics.ContractsLight
             [Localizable(false)]
 #endif
             string userMessage = null,
+            [CallerArgumentExpression("condition")] string conditionText = "",
             [CallerFilePath] string path = null, 
             [CallerLineNumber] int lineNumber = 0)
         {
             if (!condition)
             {
-                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, null, new Provenance(path, lineNumber));
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path, lineNumber));
             }
         }
 
@@ -232,12 +237,13 @@ namespace System.Diagnostics.ContractsLight
             [Localizable(false)]
 #endif
             string userMessage = null,
+            [CallerArgumentExpression("condition")] string conditionText = "",
             [CallerFilePath] string path = "",
             [CallerLineNumber] int lineNumber = 0)
         {
             if (!condition)
             {
-                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assume, userMessage, null, new Provenance(path, lineNumber));
+                ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assume, userMessage, conditionText, new Provenance(path, lineNumber));
             }
         }
 
@@ -255,6 +261,7 @@ namespace System.Diagnostics.ContractsLight
         /// </remarks>
         [Pure]
         [Conditional("CONTRACTS_LIGHT_INVARIANTS")]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static void Invariant(
             [DoesNotReturnIf(false)]
             bool condition,
@@ -290,6 +297,7 @@ namespace System.Diagnostics.ContractsLight
         /// Marker to indicate the end of the contract section of a method.
         /// </summary>
         [Conditional("NOT_SUPPORTED")]
+        // [Obsolete("Not supported by RuntimeContracts")]
         public static void EndContractBlock() { }
 
         /// <summary>

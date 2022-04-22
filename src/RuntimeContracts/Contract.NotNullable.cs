@@ -13,6 +13,12 @@ namespace System.Diagnostics.ContractsLight
 {
     public partial class Contract
     {
+        /// <summary>
+        /// Checkes that an object <paramref name="o"/> is not null.
+        /// </summary>
+        /// <remarks>
+        /// Please use normal null check instead. This method will be obsolete in the next release.
+        /// </remarks>
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void RequiresNotNull<T>(
             [NotNull]T? o,
@@ -27,6 +33,12 @@ namespace System.Diagnostics.ContractsLight
             }
         }
 
+        /// <summary>
+        /// Checkes that an object <paramref name="o"/> is not null.
+        /// </summary>
+        /// <remarks>
+        /// Please use normal null check instead. This method will be obsolete in the next release.
+        /// </remarks>
         [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
         public static void RequiresNotNull<T>(
             [NotNull]T? o,
@@ -73,6 +85,12 @@ namespace System.Diagnostics.ContractsLight
         }
 #pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 
+        /// <summary>
+        /// Checkes that an object <paramref name="o"/> is not null.
+        /// </summary>
+        /// <remarks>
+        /// Please use normal null check instead. This method will be obsolete in the next release.
+        /// </remarks>
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNull<T>(
             [NotNull]T? value, 
@@ -87,6 +105,12 @@ namespace System.Diagnostics.ContractsLight
             }
         }
 
+        /// <summary>
+        /// Checkes that an object <paramref name="o"/> is not null or empty.
+        /// </summary>
+        /// <remarks>
+        /// Please use normal null or empty check instead. This method will be obsolete in the next release.
+        /// </remarks>
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNullOrEmpty(
             [NotNull]string? o, 
@@ -103,6 +127,12 @@ namespace System.Diagnostics.ContractsLight
         }
 #pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 
+        /// <summary>
+        /// Checkes that an object <paramref name="o"/> is not null or whitespace.
+        /// </summary>
+        /// <remarks>
+        /// Please use normal null check instead. This method will be obsolete in the next release.
+        /// </remarks>
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNullOrWhiteSpace(
             [NotNull]string? o, 
@@ -119,6 +149,12 @@ namespace System.Diagnostics.ContractsLight
         }
 #pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
 
+        /// <summary>
+        /// Checkes that an object <paramref name="o"/> is not null.
+        /// </summary>
+        /// <remarks>
+        /// Please use normal null check instead. This method will be obsolete in the next release.
+        /// </remarks>
         [Conditional("CONTRACTS_LIGHT_ASSERTS")]
         public static void AssertNotNull<T>(
             [NotNull]T? value, 

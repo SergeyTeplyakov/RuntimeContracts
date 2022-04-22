@@ -9,11 +9,13 @@ namespace System.Diagnostics.ContractsLight
     {
         internal string Path { get; }
         internal int LineNumber { get; }
+        internal string ConditionText { get; }
 
-        internal AssertionFailure(string path, int lineNumber)
+        internal AssertionFailure(string path, int lineNumber, string conditionText)
         {
             Path = path;
             LineNumber = lineNumber;
+            ConditionText = conditionText;
         }
     }
 
@@ -24,11 +26,13 @@ namespace System.Diagnostics.ContractsLight
     {
         internal string Path { get; }
         internal int LineNumber { get; }
+        internal string ConditionText { get; }
 
-        internal AssertionDebugFailure(string path, int lineNumber)
+        internal AssertionDebugFailure(string path, int lineNumber, string conditionText)
         {
             Path = path;
             LineNumber = lineNumber;
+            ConditionText = conditionText;
         }
     }
 }

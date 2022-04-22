@@ -18,6 +18,7 @@ namespace System.Diagnostics.ContractsLight
     [Conditional("CONTRACTS_FULL")]
     [Conditional("DEBUG")]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Delegate, AllowMultiple = false, Inherited = false)]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractClassAttribute : Attribute
     {
         /// <nodoc />
@@ -35,6 +36,7 @@ namespace System.Diagnostics.ContractsLight
     /// </summary>
     [Conditional("CONTRACTS_FULL")]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractClassForAttribute : Attribute
     {
         /// <nodoc />
@@ -57,6 +59,7 @@ namespace System.Diagnostics.ContractsLight
     /// </summary>
     [Conditional("CONTRACTS_FULL")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractInvariantMethodAttribute : Attribute
     {
     }
@@ -65,6 +68,7 @@ namespace System.Diagnostics.ContractsLight
     /// Attribute that specifies that an assembly is a reference assembly with contracts.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractReferenceAssemblyAttribute : Attribute
     {
     }
@@ -74,6 +78,7 @@ namespace System.Diagnostics.ContractsLight
     /// </summary>
     [Conditional("CONTRACTS_FULL")]
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractRuntimeIgnoredAttribute : Attribute
     {
     }
@@ -91,6 +96,7 @@ namespace System.Diagnostics.ContractsLight
     /// </remarks>
     [Conditional("CONTRACTS_FULL")]
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property)]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractVerificationAttribute : Attribute
     {
         /// <nodoc />
@@ -107,6 +113,7 @@ namespace System.Diagnostics.ContractsLight
     [Conditional("CONTRACTS_FULL")]
     [AttributeUsage(AttributeTargets.Field)]
     [SuppressMessage("Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Justification = "Thank you very much, but we like the names we've defined for the accessors")]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractPublicPropertyNameAttribute : Attribute
     {
         /// <nodoc />
@@ -125,6 +132,7 @@ namespace System.Diagnostics.ContractsLight
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     [Conditional("CONTRACTS_FULL")]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractArgumentValidatorAttribute : Attribute
     {
     }
@@ -134,6 +142,7 @@ namespace System.Diagnostics.ContractsLight
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     [Conditional("CONTRACTS_FULL")]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractAbbreviatorAttribute : Attribute
     {
     }
@@ -143,6 +152,7 @@ namespace System.Diagnostics.ContractsLight
     /// </summary>
     [AttributeUsage(AttributeTargets.All, AllowMultiple = true, Inherited = false)]
     [Conditional("CONTRACTS_FULL")]
+    // [Obsolete("Not supported by RuntimeContracts")]
     public sealed class ContractOptionAttribute : Attribute
     {
         /// <nodoc />

@@ -6,48 +6,47 @@ using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.VisualBasic.Testing;
 using System.Threading.Tasks;
 
-namespace RuntimeContracts.Analyzer.Test
+namespace RuntimeContracts.Analyzer.Test;
+
+public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
+    where TAnalyzer : DiagnosticAnalyzer, new()
+    where TCodeFix : CodeFixProvider, new()
 {
-    public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
-        where TAnalyzer : DiagnosticAnalyzer, new()
-        where TCodeFix : CodeFixProvider, new()
+    public static DiagnosticResult Diagnostic()
+        => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic();
+
+    public static DiagnosticResult Diagnostic(string diagnosticId)
+        => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic(diagnosticId);
+
+    public static DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor)
+        => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic(descriptor);
+
+    public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
     {
-        public static DiagnosticResult Diagnostic()
-            => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic();
-
-        public static DiagnosticResult Diagnostic(string diagnosticId)
-            => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic(diagnosticId);
-
-        public static DiagnosticResult Diagnostic(DiagnosticDescriptor descriptor)
-            => VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix, MSTestVerifier>.Diagnostic(descriptor);
-
-        public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+        var test = new Test
         {
-            var test = new Test
-            {
-                TestCode = source,
-            };
+            TestCode = source,
+        };
 
-            test.ExpectedDiagnostics.AddRange(expected);
-            await test.RunAsync();
-        }
+        test.ExpectedDiagnostics.AddRange(expected);
+        await test.RunAsync();
+    }
 
-        public static Task VerifyCodeFixAsync(string source, string fixedSource)
-            => VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, fixedSource);
+    public static Task VerifyCodeFixAsync(string source, string fixedSource)
+        => VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, fixedSource);
 
-        public static Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource)
-            => VerifyCodeFixAsync(source, new[] { expected }, fixedSource);
+    public static Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource)
+        => VerifyCodeFixAsync(source, new[] { expected }, fixedSource);
 
-        public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)
+    public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)
+    {
+        var test = new Test
         {
-            var test = new Test
-            {
-                TestCode = source,
-                FixedCode = fixedSource,
-            };
+            TestCode = source,
+            FixedCode = fixedSource,
+        };
 
-            test.ExpectedDiagnostics.AddRange(expected);
-            await test.RunAsync();
-        }
+        test.ExpectedDiagnostics.AddRange(expected);
+        await test.RunAsync();
     }
 }
