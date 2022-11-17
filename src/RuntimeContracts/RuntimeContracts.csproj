@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <RuntimeContractsVersion>0.4.0.0</RuntimeContractsVersion>
         <TargetFramework>netstandard1.1</TargetFramework>
+        <RootNamespace>System.Diagnostics.ContractsLight</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="RuntimeContracts.Analyzer" Version="0.3.0" />
+        <PackageReference Include="RuntimeContracts.Analyzer" Version="0.4.0" />
     </ItemGroup>
 
     <PropertyGroup>
-        <PackageVersion>0.3.1.0</PackageVersion>
+        <PackageVersion>$(RuntimeContractsVersion)</PackageVersion>
         <Authors>seteplia</Authors>
         <Title>Runtime Contracts</Title>
         <PackageProjectUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</PackageProjectUrl>
@@ -18,8 +20,11 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>Lightweight runtime-only library for contract validation.</Description>
         <PackageReleaseNotes>
+            0.4.0
+                * Add no-allocation interpolated string API.
+                * Use package version as assembly and file version.
             0.3.1
-                * Embed debugging information into the dll
+                * Embed debugging information into the dll.
             0.3.0
                 * Add side-by-side fluent API that can be used with the existing contract checks.
             0.2.1
@@ -38,9 +43,9 @@
         <PackageTags>RuntimeContracts, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.1.0.0</Version>
+        <Version>$(RuntimeContractsVersion)</Version>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>RuntimeContracts.snk</AssemblyOriginatorKeyFile>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>10.0</LangVersion>
     </PropertyGroup>
 </Project>

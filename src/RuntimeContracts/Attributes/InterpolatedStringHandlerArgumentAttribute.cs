@@ -1,4 +1,9 @@
-﻿namespace System.Runtime.CompilerServices
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#if !NET6_0_OR_GREATER
+
+namespace System.Runtime.CompilerServices
 {
     //
     // Summary:
@@ -10,13 +15,7 @@
         //
         // Summary:
         //     Gets the names of the arguments that should be passed to the handler.
-        public string[] Arguments
-        {
-            get
-            {
-                throw null;
-            }
-        }
+        public string[] Arguments { get; }
 
         //
         // Summary:
@@ -28,6 +27,7 @@
         //     The name of the argument that should be passed to the handler.
         public InterpolatedStringHandlerArgumentAttribute(string argument)
         {
+            Arguments = new string[] { argument };
         }
 
         //
@@ -40,6 +40,9 @@
         //     The names of the arguments that should be passed to the handler.
         public InterpolatedStringHandlerArgumentAttribute(params string[] arguments)
         {
+            Arguments = arguments;
         }
     }
 }
+
+#endif

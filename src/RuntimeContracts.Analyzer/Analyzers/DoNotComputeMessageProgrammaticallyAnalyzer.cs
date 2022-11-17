@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,7 +13,7 @@ using static RuntimeContracts.Analyzer.Core.ContractMethodNames;
 namespace RuntimeContracts.Analyzer;
 
 /// <summary>
-/// Fluent API is obsolete with new interpolated string improvements in C# 10.
+/// Warns when a contract message is computed programmatically and not using interpolated strings.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class DoNotComputeMessageProgrammaticallyAnalyzer : DiagnosticAnalyzer
@@ -45,8 +46,7 @@ public class DoNotComputeMessageProgrammaticallyAnalyzer : DiagnosticAnalyzer
 
         if (resolver.IsContractInvocation(invocation.TargetMethod, contracts))
         {
-            if (invocation.Arguments[0].Value is ILiteralOperation literalOperation &&
-                literalOperation.ConstantValue.Value is bool literalValue && literalValue == false)
+            if (invocation.Arguments[0].Value is ILiteralOperation {ConstantValue.Value: false})
             {
                 // Ignoring the cases like 'Contract.Assert(false, constructed message)'
                 return;
@@ -59,6 +59,24 @@ public class DoNotComputeMessageProgrammaticallyAnalyzer : DiagnosticAnalyzer
                 // this is fine for sure, we call with an interpolated string argument.
                 return;
             }
+            
+            // Ok to have message: "Msg" + "msg"
+            if (messageExpression.Value is IBinaryOperation binaryOp && ContainsOnlyLiterals(binaryOp))
+            {
+                return;
+            }
+
+            // Ok to reference locals
+            if (messageExpression.Value is ILocalReferenceOperation or IParameterReferenceOperation)
+            {
+                return;
+            }
+
+            if (messageExpression.Value.ConstantValue.HasValue)
+            {
+                // This is $"foo bar" or $"foo {nameof(x)}" cases.
+                return;
+            }
 
             if (messageExpression.Value is not IDefaultValueOperation &&
                 messageExpression.Value is not ILiteralOperation &&
@@ -69,5 +87,29 @@ public class DoNotComputeMessageProgrammaticallyAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(diagnostic);
             }
         }
+    }
+
+    private static bool ContainsOnlyLiterals(IBinaryOperation? binaryOperation)
+    {
+        if (binaryOperation is null)
+        {
+            return true;
+        }
+
+        if (binaryOperation.LeftOperand is not (ILiteralOperation or IBinaryOperation))
+        {
+            return false;
+        }
+
+        if (binaryOperation.RightOperand is not (ILiteralOperation or IBinaryOperation))
+        {
+            return false;
+        }
+
+        return (binaryOperation.LeftOperand is ILiteralOperation ||
+                ContainsOnlyLiterals((binaryOperation.LeftOperand as IBinaryOperation)))
+               &&
+               (binaryOperation.RightOperand is ILiteralOperation ||
+                ContainsOnlyLiterals((binaryOperation.RightOperand as IBinaryOperation)));
     }
 }

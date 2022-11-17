@@ -10,6 +10,87 @@ namespace RuntimeContracts.Analyzer.Test;
 public class DoNotComputeMessageProgrammaticallyAnalyzerTests
 {
     [TestMethod]
+    public async Task NoWarn_On_Message_Variable()
+    {
+        var test = @"using System.Diagnostics.ContractsLight;
+            #nullable enable
+            namespace ConsoleApplication1
+            {
+                class TypeName
+                {
+                    public TypeName(string s, string[] c, string argumentMessage)
+                    {
+                        string message = null;
+                        Contract.Assert(s != null, message);
+                        Contract.Assert(s != null, argumentMessage);
+
+                        Contract.Assert(TryGetMessage(out var msg), msg);
+                    }
+
+                    private static bool TryGetMessage(out string message)
+                    {
+                        message = string.Empty;
+                        return true;
+                    }
+                }
+            }";
+
+        await new VerifyCS.Test
+        {
+            TestState = { Sources = { test } },
+            LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp10
+        }.WithoutGeneratedCodeVerification().RunAsync();
+    }
+    
+    [TestMethod]
+    public async Task NoWarn_On_Message_Concat()
+    {
+        var test = @"using System.Diagnostics.ContractsLight;
+            #nullable enable
+            namespace ConsoleApplication1
+            {
+                class TypeName
+                {
+                    public TypeName(string s, string[] c)
+                    {
+                        string message = null;
+                        Contract.Assert(s != null, ""msg"" + ""1"");
+                    }
+                }
+            }";
+
+        await new VerifyCS.Test
+        {
+            TestState = { Sources = { test } },
+            LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp10
+        }.WithoutGeneratedCodeVerification().RunAsync();
+    }
+
+    [TestMethod]
+    public async Task NoWarn_On_Message_With_Nameof()
+    {
+        var test = @"using System.Diagnostics.ContractsLight;
+            #nullable enable
+            namespace ConsoleApplication1
+            {
+                class TypeName
+                {
+                    public TypeName(string s, string[] c)
+                    {
+                        Contract.Assert(s != null, $""{nameof(TypeName)} 42"");
+                        Contract.Assert(s != null, $""s != null"");
+                    }
+                }
+            }";
+
+        await new VerifyCS.Test
+        {
+            TestState = { Sources = { test } },
+            LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp10
+        }.WithoutGeneratedCodeVerification().RunAsync();
+    }
+
+    [TestMethod]
     public async Task Warn_For_CSharp_10()
     {
         var test = @"using System.Diagnostics.ContractsLight;

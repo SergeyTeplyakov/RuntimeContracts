@@ -77,7 +77,7 @@ public class DiagnosticIds
         title: "Do not use Contracts Fluent API",
         messageFormat: "Do not use Contracts Fluent API",
         category: "Usability",
-        defaultSeverity: DiagnosticSeverity.Info,
+        defaultSeverity: DiagnosticSeverity.Hidden,
         isEnabledByDefault: true,
         description: "The fluent API like Contract.Check(cond)?.Assert(message) is obsolete because interpolated strings in C# 10 solve the memory allocation issue out of the box.");
 }

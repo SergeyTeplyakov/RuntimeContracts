@@ -3,47 +3,46 @@ using System.Globalization;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
-namespace System.Diagnostics.ContractsLight
+namespace System.Diagnostics.ContractsLight;
+
+/// <summary>
+/// Internal helper class responsible for raising appropriate exception type when a contract is violated.
+/// </summary>
+internal static class ContractRuntimeHelper
 {
-
-    /// <summary>
-    /// Internal helper class responsible for raising appropriate exception type when a contract is violated.
-    /// </summary>
-    internal static class ContractRuntimeHelper
+    // No inlining is explicit to put the method on the call stack.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    [DoesNotReturn]
+    public static void ReportFailure(ContractFailureKind kind, string msg, string conditionTxt, Provenance provenance)
     {
-        // No inlining is explicit to put the method on the call stack.
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        [DoesNotReturn]
-        public static void ReportFailure(ContractFailureKind kind, string msg, string conditionTxt, Provenance provenance)
+        if (!RaiseContractFailedEvent(kind, msg, conditionTxt, provenance, out var text))
         {
-            if (!RaiseContractFailedEvent(kind, msg, conditionTxt, provenance, out var text))
-            {
-                TriggerFailure(kind, text, msg, conditionTxt);
-            }
+            TriggerFailure(kind, text, msg, conditionTxt);
         }
+    }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public static void ReportPreconditionFailure<TException>(string msg, string conditionTxt, Provenance provenence) where TException : Exception
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ReportPreconditionFailure<TException>(string msg, string conditionTxt, Provenance provenence) where TException : Exception
 #if !NETSTANDARD2_0
-            // Previous version are relies on new constraint for exception construction.
-            , new()
+        // Previous version are relies on new constraint for exception construction.
+        , new()
 #endif
+    {
+        if (!RaiseContractFailedEvent(ContractFailureKind.Precondition, msg, conditionTxt, provenence, out var text))
         {
-            if (!RaiseContractFailedEvent(ContractFailureKind.Precondition, msg, conditionTxt, provenence, out var text))
-            {
-                // TODO: need to cache the factory or maybe switch to reflection-based approach.
-                var factory = GenerateExceptionFactory<TException>();
-                throw factory(text);
-            }
+            // TODO: need to cache the factory or maybe switch to reflection-based approach.
+            var factory = GenerateExceptionFactory<TException>();
+            throw factory(text);
         }
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void TriggerFailure(ContractFailureKind kind, string msg, string userMessage, string conditionTxt)
-        {
-            throw new ContractException(kind, msg, userMessage, conditionTxt);
-        }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void TriggerFailure(ContractFailureKind kind, string msg, string userMessage, string conditionTxt)
+    {
+        throw new ContractException(kind, msg, userMessage, conditionTxt);
+    }
 
-        // Reflection is only supported by NETSTANDARD2_0
+    // Reflection is only supported by NETSTANDARD2_0
 #if NETSTANDARD2_0
         /// <summary>
         /// Helper that generates the following factory method:
@@ -70,10 +69,10 @@ namespace System.Diagnostics.ContractsLight
         }
 
 #else //NETSTANDARD2_0
-        public static Func<string, TException> GenerateExceptionFactory<TException>() where TException : new()
-        {
-            return arg => new TException();
-        }
+    public static Func<string, TException> GenerateExceptionFactory<TException>() where TException : new()
+    {
+        return arg => new TException();
+    }
 #endif
 
 #if false
@@ -117,85 +116,84 @@ namespace System.Diagnostics.ContractsLight
         }
 #endif
 
-        public static event EventHandler<ContractFailedEventArgs> ContractFailed;
+    public static event EventHandler<ContractFailedEventArgs> ContractFailed;
 
-        /// <summary>
-        /// Contract class call this method on a contract failure to allow listeners to be notified.
-        /// The method should not perform any failure (assert/throw) itself.
-        /// This method has 3 functions:
-        /// 1. Call any contract hooks (such as listeners to Contract failed events)
-        /// 2. Determine if the listeneres deem the failure as handled (then resultFailureMessage should be set to null)
-        /// 3. Produce a localized resultFailureMessage used in advertising the failure subsequently.
-        /// </summary>
-        /// On exit: null if the event was handled and should not trigger a failure.
-        ///          Otherwise, returns the localized failure message.
-        [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public static bool RaiseContractFailedEvent(
-            ContractFailureKind failureKind, 
-            string userMessage, 
-            string conditionText, 
-            Provenance provenence, 
-            out string resultFailureMessage)
+    /// <summary>
+    /// Contract class call this method on a contract failure to allow listeners to be notified.
+    /// The method should not perform any failure (assert/throw) itself.
+    /// This method has 3 functions:
+    /// 1. Call any contract hooks (such as listeners to Contract failed events)
+    /// 2. Determine if the listeneres deem the failure as handled (then resultFailureMessage should be set to null)
+    /// 3. Produce a localized resultFailureMessage used in advertising the failure subsequently.
+    /// </summary>
+    /// On exit: null if the event was handled and should not trigger a failure.
+    ///          Otherwise, returns the localized failure message.
+    [SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
+    [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+    public static bool RaiseContractFailedEvent(
+        ContractFailureKind failureKind, 
+        string userMessage, 
+        string conditionText, 
+        Provenance provenence, 
+        out string resultFailureMessage)
+    {
+        bool handled = false;
+
+        string displayMessage = "contract failed.";  // Incomplete, but in case of OOM during resource lookup...
+        ContractFailedEventArgs eventArgs = null;  // In case of OOM.
+        try
         {
-            bool handled = false;
+            displayMessage = GetDisplayMessage(failureKind, userMessage, conditionText, provenence);
+            resultFailureMessage = displayMessage;
 
-            string displayMessage = "contract failed.";  // Incomplete, but in case of OOM during resource lookup...
-            ContractFailedEventArgs eventArgs = null;  // In case of OOM.
-            try
+            EventHandler<ContractFailedEventArgs> contractFailedEventLocal = ContractFailed;
+            if (contractFailedEventLocal != null)
             {
-                displayMessage = GetDisplayMessage(failureKind, userMessage, conditionText, provenence);
-                resultFailureMessage = displayMessage;
-
-                EventHandler<ContractFailedEventArgs> contractFailedEventLocal = ContractFailed;
-                if (contractFailedEventLocal != null)
+                eventArgs = new ContractFailedEventArgs(failureKind, displayMessage, conditionText);
+                foreach (EventHandler<ContractFailedEventArgs> handler in contractFailedEventLocal.GetInvocationList())
                 {
-                    eventArgs = new ContractFailedEventArgs(failureKind, displayMessage, conditionText);
-                    foreach (EventHandler<ContractFailedEventArgs> handler in contractFailedEventLocal.GetInvocationList())
+                    try
                     {
-                        try
-                        {
-                            handler(null, eventArgs);
-                        }
-                        catch (Exception e)
-                        {
-                            eventArgs.ThrownDuringHandler = e;
-                            eventArgs.SetUnwind();
-                        }
+                        handler(null, eventArgs);
                     }
-
-                    if (eventArgs.Unwind)
+                    catch (Exception e)
                     {
-                        // unwind
-                        throw new ContractException(failureKind, displayMessage, userMessage, conditionText);
+                        eventArgs.ThrownDuringHandler = e;
+                        eventArgs.SetUnwind();
                     }
                 }
-            }
-            finally
-            {
-                if (eventArgs != null && eventArgs.Handled)
+
+                if (eventArgs.Unwind)
                 {
-                    handled = true;
+                    // unwind
+                    throw new ContractException(failureKind, displayMessage, userMessage, conditionText);
                 }
             }
-
-            return handled;
         }
-
-        private static string GetDisplayMessage(ContractFailureKind failureKind, string userMessage, string conditionText, Provenance provenence)
+        finally
         {
-            string message = GetFailureMessage(failureKind, conditionText);
-
-            return string.IsNullOrEmpty(userMessage)
-                ? string.Format(CultureInfo.InvariantCulture, "{0}\r\n\tat {1}", message, provenence)
-                : string.Format(CultureInfo.InvariantCulture, "{0}: {1}\r\n\tat {2}", message, userMessage, provenence);
+            if (eventArgs != null && eventArgs.Handled)
+            {
+                handled = true;
+            }
         }
 
-        private static string GetFailureMessage(ContractFailureKind failureKind, string conditionText)
-        {
-            return string.IsNullOrEmpty(conditionText)
-                ? string.Format(CultureInfo.InvariantCulture, "{0}", failureKind.ToDisplayString())
-                : string.Format(CultureInfo.InvariantCulture, "{0} ({1})", failureKind.ToDisplayString(), conditionText);
-        }
+        return handled;
+    }
+
+    private static string GetDisplayMessage(ContractFailureKind failureKind, string userMessage, string conditionText, Provenance provenence)
+    {
+        string message = GetFailureMessage(failureKind, conditionText);
+
+        return string.IsNullOrEmpty(userMessage)
+            ? string.Format(CultureInfo.InvariantCulture, "{0}\r\n\tat {1}", message, provenence)
+            : string.Format(CultureInfo.InvariantCulture, "{0}: {1}\r\n\tat {2}", message, userMessage, provenence);
+    }
+
+    private static string GetFailureMessage(ContractFailureKind failureKind, string conditionText)
+    {
+        return string.IsNullOrEmpty(conditionText)
+            ? string.Format(CultureInfo.InvariantCulture, "{0}", failureKind.ToDisplayString())
+            : string.Format(CultureInfo.InvariantCulture, "{0} ({1})", failureKind.ToDisplayString(), conditionText);
     }
 }

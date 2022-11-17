@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define CONTRACTS_LIGHT_ASSERTS
+#define CONTRACTS_LIGHT_PRECONDITIONS
+
+using System;
 using System.Diagnostics.ContractsLight;
 
 using Xunit;
@@ -11,5 +14,24 @@ public class ContractAssertTests
     public void PreconditionsShouldFail()
     {
         new ContractAssertions().AssertionFailures(true);
+    }
+
+    [Fact]
+    public void MessageCanBeNull()
+    {
+        Assert.NotNull(shouldFail());
+
+        static Exception shouldFail()
+        {
+            try
+            {
+                Contract.Assert(false, null);
+                return null;
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
     }
 }
