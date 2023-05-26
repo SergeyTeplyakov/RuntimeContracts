@@ -20,6 +20,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>Lightweight runtime-only library for contract validation.</Description>
         <PackageReleaseNotes>
+            0.5.0
+                * Make this version backward compatible with versions 0.3.+ and 0.4.+.
             0.4.0
                 * Add no-allocation interpolated string API.
                 * Use package version as assembly and file version.
