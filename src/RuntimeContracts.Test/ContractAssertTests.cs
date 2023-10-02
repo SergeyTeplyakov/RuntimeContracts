@@ -1,16 +1,37 @@
-﻿using System;
+﻿#define CONTRACTS_LIGHT_ASSERTS
+#define CONTRACTS_LIGHT_PRECONDITIONS
+
+using System;
 using System.Diagnostics.ContractsLight;
 
 using Xunit;
 
-namespace RuntimeContracts.Test
+namespace RuntimeContracts.Test;
+
+public class ContractAssertTests
 {
-    public class ContractAssertTests
+    [Fact]
+    public void PreconditionsShouldFail()
     {
-        [Fact]
-        public void PreconditionsShouldFail()
+        new ContractAssertions().AssertionFailures(true);
+    }
+
+    [Fact]
+    public void MessageCanBeNull()
+    {
+        Assert.NotNull(shouldFail());
+
+        static Exception shouldFail()
         {
-            new ContractAssertions().AssertionFailures(true);
+            try
+            {
+                Contract.Assert(false, null);
+                return null;
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
     }
 }

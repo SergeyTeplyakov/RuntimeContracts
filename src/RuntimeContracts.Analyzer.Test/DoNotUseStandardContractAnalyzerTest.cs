@@ -4,15 +4,15 @@ using VerifyCS = RuntimeContracts.Analyzer.Test.CSharpCodeFixVerifier<
     RuntimeContracts.Analyzer.DoNotUseStandardContractAnalyzer,
     RuntimeContracts.Analyzer.UseRuntimeContractsCodeFixProvider>;
 
-namespace RuntimeContracts.Analyzer.Test
+namespace RuntimeContracts.Analyzer.Test;
+
+[TestClass]
+public class DoNotUseStandardContractAnalyzerTest
 {
-    [TestClass]
-    public class DoNotUseStandardContractAnalyzerTest
+    [TestMethod]
+    public async Task FailsOnContractRequires()
     {
-        [TestMethod]
-        public async Task FailsOnContractRequires()
-        {
-            var test = @"using System.Diagnostics.Contracts;
+        var test = @"using System.Diagnostics.Contracts;
     
     namespace ConsoleApplication1
     {
@@ -25,17 +25,17 @@ namespace RuntimeContracts.Analyzer.Test
         }
     }";
 
-            await new VerifyCS.Test
-            {
-                TestState = { Sources = { test } },
-                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-            }.WithoutGeneratedCodeVerification().RunAsync();
-        }
-
-        [TestMethod]
-        public async Task FixUsingOnTopLevel()
+        await new VerifyCS.Test
         {
-            var test = @"using System;
+            TestState = { Sources = { test } },
+            FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+        }.WithoutGeneratedCodeVerification().RunAsync();
+    }
+
+    [TestMethod]
+    public async Task FixUsingOnTopLevel()
+    {
+        var test = @"using System;
 using System.Diagnostics.Contracts;
     
     namespace ConsoleApplication1
@@ -49,17 +49,17 @@ using System.Diagnostics.Contracts;
         }
     }";
 
-            await new VerifyCS.Test
-            {
-                TestState = { Sources = { test } },
-                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-            }.WithoutGeneratedCodeVerification().RunAsync();
-        }
-
-        [TestMethod]
-        public async Task FixUsingInsideNamespace()
+        await new VerifyCS.Test
         {
-            var test = @"using System;
+            TestState = { Sources = { test } },
+            FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+        }.WithoutGeneratedCodeVerification().RunAsync();
+    }
+
+    [TestMethod]
+    public async Task FixUsingInsideNamespace()
+    {
+        var test = @"using System;
     
     namespace ConsoleApplication1
     {
@@ -73,17 +73,17 @@ using System.Diagnostics.Contracts;
         }
     }";
 
-            await new VerifyCS.Test
-            {
-                TestState = { Sources = { test } },
-                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-            }.WithoutGeneratedCodeVerification().RunAsync();
-        }
-
-        [TestMethod]
-        public async Task FixUsingInsideSecondNamespace()
+        await new VerifyCS.Test
         {
-            var test = @"using System;
+            TestState = { Sources = { test } },
+            FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+        }.WithoutGeneratedCodeVerification().RunAsync();
+    }
+
+    [TestMethod]
+    public async Task FixUsingInsideSecondNamespace()
+    {
+        var test = @"using System;
 
 namespace NsFake {
 using System.Diagnostics.Contracts;
@@ -108,11 +108,10 @@ using System.Diagnostics.Contracts;
         }
     }";
 
-            await new VerifyCS.Test
-            {
-                TestState = { Sources = { test } },
-                FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
-            }.WithoutGeneratedCodeVerification().RunAsync();
-        }
+        await new VerifyCS.Test
+        {
+            TestState = { Sources = { test } },
+            FixedState = { Sources = { test.Replace("System.Diagnostics.Contracts", "System.Diagnostics.ContractsLight") } },
+        }.WithoutGeneratedCodeVerification().RunAsync();
     }
 }

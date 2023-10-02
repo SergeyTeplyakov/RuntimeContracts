@@ -6,24 +6,32 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>10.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>
         <PackageId>RuntimeContracts.Analyzer</PackageId>
         <Title>RuntimeContracts Analyzers</Title>
-        <PackageVersion>0.3.2.0</PackageVersion>
+        <PackageVersion>0.4.3.0</PackageVersion>
         <Authors>seteplia</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/SergeyTeplyakov/RuntimeContracts</RepositoryUrl>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <Description>Set of roslyn-based analyzers for RuntimeContracts library.</Description>
         <PackageReleaseNotes>
+            0.4.3
+                * Make RA009 hidden to avoid issues in Bxl.
+            0.4.2
+                * Avoid warnings when a contract message is a parameter.
+            0.4.1
+                * Avoid warnings when a message is variable or a const expression.
+            0.4.0
+                * Add support for no allocation interpolated string based API.
             0.3.2
-                * Add a fixer to switch awayt from Contract.RequiresNotNull and Contract.AssertNotNull
+                * Add a fixer to switch awayt from Contract.RequiresNotNull and Contract.AssertNotNull.
             0.3.1
-                * Fix performance issues (thanks to Sam Harwell)
+                * Fix performance issues (thanks to Sam Harwell).
             0.3.0
                 * Add side-by-side fluent API and analyzers that can be used with the existing contracts.
             0.2.1
@@ -78,7 +86,7 @@
     <ItemGroup>
         <!-- Analyzer packages should not have any dependencies. -->
         <PackageReference Update="@(PackageReference)" PrivateAssets="all" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.10.0" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
         <ProjectReference Update="@(ProjectReference)" PrivateAssets="all" />
     </ItemGroup>
 

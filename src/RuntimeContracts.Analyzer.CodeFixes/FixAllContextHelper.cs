@@ -9,41 +9,41 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CodeFixes;
 
-namespace Microsoft.CodeAnalysis.CodeStyle
+namespace Microsoft.CodeAnalysis.CodeStyle;
+
+/// <summary>
+/// A helper that implements a custom batch mode that allows fixing more than one diagnostic at the same time.
+/// </summary>
+internal static class FixAllContextHelper
 {
-    /// <summary>
-    /// A helper that implements a custom batch mode that allows fixing more than one diagnostic at the same time.
-    /// </summary>
-    internal static class FixAllContextHelper
+    public static async Task<ImmutableDictionary<Document, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
+        FixAllContext fixAllContext)
     {
-        public static async Task<ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
-            FixAllContext fixAllContext)
+        var cancellationToken = fixAllContext.CancellationToken;
+
+        var allDiagnostics = ImmutableArray<Diagnostic>.Empty;
+        var projectsToFix = ImmutableArray<Project>.Empty;
+
+        var document = fixAllContext.Document;
+        var project = fixAllContext.Project;
+
+        switch (fixAllContext.Scope)
         {
-            var cancellationToken = fixAllContext.CancellationToken;
-
-            var allDiagnostics = ImmutableArray<Diagnostic>.Empty;
-            var projectsToFix = ImmutableArray<Project>.Empty;
-
-            var document = fixAllContext.Document;
-            var project = fixAllContext.Project;
-
-            switch (fixAllContext.Scope)
-            {
-                case FixAllScope.Document:
+            case FixAllScope.Document:
                 if (document != null)
                 {
                     var documentDiagnostics = await fixAllContext.GetDocumentDiagnosticsAsync(document).ConfigureAwait(false);
-                    return ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>.Empty.SetItem(document, documentDiagnostics);
+                    return ImmutableDictionary<Document, ImmutableArray<Diagnostic>>.Empty.SetItem(document, documentDiagnostics);
                 }
 
                 break;
 
-                case FixAllScope.Project:
+            case FixAllScope.Project:
                 projectsToFix = ImmutableArray.Create(project);
                 allDiagnostics = await fixAllContext.GetAllDiagnosticsAsync(project).ConfigureAwait(false);
                 break;
 
-                case FixAllScope.Solution:
+            case FixAllScope.Solution:
                 projectsToFix = project.Solution.Projects
                     .Where(p => p.Language == project.Language)
                     .ToImmutableArray();
@@ -64,65 +64,72 @@ namespace Microsoft.CodeAnalysis.CodeStyle
                 await Task.WhenAll(tasks).ConfigureAwait(false);
                 allDiagnostics = allDiagnostics.AddRange(diagnostics.SelectMany(i => i.Value));
                 break;
-            }
-
-            if (allDiagnostics.IsEmpty)
-            {
-                return ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>.Empty;
-            }
-
-            return await GetDocumentDiagnosticsToFixAsync(
-                allDiagnostics, projectsToFix, fixAllContext.CancellationToken).ConfigureAwait(false);
         }
 
-        private static async Task<ImmutableDictionary<Document?, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
-            ImmutableArray<Diagnostic> diagnostics,
-            ImmutableArray<Project> projects,
-            CancellationToken cancellationToken)
+        if (allDiagnostics.IsEmpty)
         {
-            var treeToDocumentMap = await GetTreeToDocumentMapAsync(projects, cancellationToken).ConfigureAwait(false);
+            return ImmutableDictionary<Document, ImmutableArray<Diagnostic>>.Empty;
+        }
 
-            var builder = ImmutableDictionary.CreateBuilder<Document?, ImmutableArray<Diagnostic>>();
-            foreach (var documentAndDiagnostics in diagnostics.GroupBy(d => GetReportedDocument(d, treeToDocumentMap)))
+        return await GetDocumentDiagnosticsToFixAsync(
+            allDiagnostics, projectsToFix, fixAllContext.CancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task<ImmutableDictionary<Document, ImmutableArray<Diagnostic>>> GetDocumentDiagnosticsToFixAsync(
+        ImmutableArray<Diagnostic> diagnostics,
+        ImmutableArray<Project> projects,
+        CancellationToken cancellationToken)
+    {
+        var treeToDocumentMap = await GetTreeToDocumentMapAsync(projects, cancellationToken).ConfigureAwait(false);
+
+        var builder = ImmutableDictionary.CreateBuilder<Document, ImmutableArray<Diagnostic>>();
+        foreach (var documentAndDiagnostics in diagnostics.GroupBy(d => GetReportedDocument(d, treeToDocumentMap)))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var document = documentAndDiagnostics.Key;
+            var diagnosticsForDocument = documentAndDiagnostics.ToImmutableArray();
+
+            if (document is not null)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var document = documentAndDiagnostics.Key;
-                var diagnosticsForDocument = documentAndDiagnostics.ToImmutableArray();
                 builder.Add(document, diagnosticsForDocument);
             }
-
-            return builder.ToImmutable();
         }
 
-        private static async Task<ImmutableDictionary<SyntaxTree, Document>> GetTreeToDocumentMapAsync(ImmutableArray<Project> projects, CancellationToken cancellationToken)
+        return builder.ToImmutable();
+    }
+
+    private static async Task<ImmutableDictionary<SyntaxTree, Document>> GetTreeToDocumentMapAsync(ImmutableArray<Project> projects, CancellationToken cancellationToken)
+    {
+        var builder = ImmutableDictionary.CreateBuilder<SyntaxTree, Document>();
+        foreach (var project in projects)
         {
-            var builder = ImmutableDictionary.CreateBuilder<SyntaxTree, Document>();
-            foreach (var project in projects)
+            cancellationToken.ThrowIfCancellationRequested();
+            foreach (var document in project.Documents)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                foreach (var document in project.Documents)
+                var tree = await document.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
+
+                if (tree is not null)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    var tree = await document.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
                     builder.Add(tree, document);
                 }
             }
-
-            return builder.ToImmutable();
         }
 
-        private static Document? GetReportedDocument(Diagnostic diagnostic, ImmutableDictionary<SyntaxTree, Document> treeToDocumentsMap)
+        return builder.ToImmutable();
+    }
+
+    private static Document? GetReportedDocument(Diagnostic diagnostic, ImmutableDictionary<SyntaxTree, Document> treeToDocumentsMap)
+    {
+        var tree = diagnostic.Location.SourceTree;
+        if (tree is not null)
         {
-            var tree = diagnostic.Location.SourceTree;
-            if (tree != null)
+            if (treeToDocumentsMap.TryGetValue(tree, out var document))
             {
-                if (treeToDocumentsMap.TryGetValue(tree, out var document))
-                {
-                    return document;
-                }
+                return document;
             }
-
-            return null;
         }
+
+        return null;
     }
 }

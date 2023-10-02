@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts.Analyzer", "RuntimeContracts.Analyzer\RuntimeContracts.Analyzer.csproj", "{78DAC0D2-3455-4403-883C-C2528F896C38}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts.Analyzer.Test", "RuntimeContracts.Analyzer.Test\RuntimeContracts.Analyzer.Test.csproj", "{5D436B89-564D-4D6F-81F8-A26A8ABB0F05}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts.Analyzer.Vsix", "RuntimeContracts.Analyzer.Vsix\RuntimeContracts.Analyzer.Vsix.csproj", "{ECEB2FC6-F04A-4CC5-AA6D-891324FBD5FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuntimeContracts", "RuntimeContracts\RuntimeContracts.csproj", "{C987EDFE-DCE2-426B-BF20-9BB6FF7EBD30}"
 EndProject
@@ -31,10 +29,6 @@ Global
 		{5D436B89-564D-4D6F-81F8-A26A8ABB0F05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D436B89-564D-4D6F-81F8-A26A8ABB0F05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D436B89-564D-4D6F-81F8-A26A8ABB0F05}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ECEB2FC6-F04A-4CC5-AA6D-891324FBD5FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ECEB2FC6-F04A-4CC5-AA6D-891324FBD5FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ECEB2FC6-F04A-4CC5-AA6D-891324FBD5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ECEB2FC6-F04A-4CC5-AA6D-891324FBD5FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C987EDFE-DCE2-426B-BF20-9BB6FF7EBD30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C987EDFE-DCE2-426B-BF20-9BB6FF7EBD30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C987EDFE-DCE2-426B-BF20-9BB6FF7EBD30}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -3,38 +3,37 @@ using System;
 using System.Diagnostics.ContractsLight;
 using Xunit;
 
-namespace RuntimeContracts.FluentContracts.Test
-{
-    public class ContractPreconditionTests
-    {
-        [Fact]
-        public void CorrectExceptionTypeShouldBeGenerated()
-        {
-            Assert.Throws<ArgumentNullException>(() => WillFail(null));
+namespace RuntimeContracts.FluentContracts.Test;
 
-            static void WillFail(string s)
-            {
-                Contract.Requires<ArgumentNullException>(s != null, "custom message");
-            }
+public class ContractPreconditionTests
+{
+    [Fact]
+    public void CorrectExceptionTypeShouldBeGenerated()
+    {
+        Assert.Throws<ArgumentNullException>(() => WillFail(null));
+
+        static void WillFail(string s)
+        {
+            Contract.Requires<ArgumentNullException>(s != null, "custom message");
+        }
+    }
+
+    [Fact]
+    public void PreconditionsShouldFail()
+    {
+        try
+        {
+            someMethod(-1);
+            Assert.True(false, "someMethod(-1) should throw contract exception");
+        }
+        catch(Exception e) when (e.GetType().Name.Contains("ContractException"))
+        {
+
         }
 
-        [Fact]
-        public void PreconditionsShouldFail()
+        static void someMethod(int arg)
         {
-            try
-            {
-                someMethod(-1);
-                Assert.True(false, "someMethod(-1) should throw contract exception");
-            }
-            catch(Exception e) when (e.GetType().Name.Contains("ContractException"))
-            {
-
-            }
-
-            static void someMethod(int arg)
-            {
-                Contract.Requires(arg > 0);
-            }
+            Contract.Requires(arg > 0);
         }
     }
 }

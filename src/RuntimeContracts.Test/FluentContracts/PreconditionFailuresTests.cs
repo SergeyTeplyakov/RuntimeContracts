@@ -9,34 +9,34 @@ using System.Diagnostics.ContractsLight;
 
 using Xunit;
 
-namespace RuntimeContracts.Test
-{
-    public class PreconditionFailuresTests
-    {
-        [Fact]
-        public void PreconditionFailure()
-        {
-            Action a = () => WillFail(null);
-            a.ShouldThrow();
+namespace RuntimeContracts.Test;
 
-            static void WillFail(string s)
-            {
-                Contract.Check(s != null)?.Requires("custom message");
-            }
+public class PreconditionFailuresTests
+{
+    [Fact]
+    public void PreconditionFailure()
+    {
+        Action a = () => WillFail(null);
+        a.ShouldThrow();
+
+        static void WillFail(string s)
+        {
+            Contract.Check(s != null)?.Requires("custom message");
         }
+    }
 
 #if DEBUG
-        [Fact]
-        public void PreconditionDebugFailure()
-        {
-            Action a = () => WillFail(null);
-            a.ShouldThrow();
+    [Fact]
+    public void PreconditionDebugFailure()
+    {
+        Action a = () => WillFail(null);
+        a.ShouldThrow();
 
-            static void WillFail(string s)
-            {
-                Contract.CheckDebug(s != null)?.Requires("custom message");
-            }
+        static void WillFail(string s)
+        {
+            Contract.CheckDebug(s != null)?.Requires("custom message");
         }
+    }
 #else
         [Fact]
         public void PreconditionDebugShouldNotFailInRelease()
@@ -50,5 +50,4 @@ namespace RuntimeContracts.Test
             }
         }
 #endif
-    }
 }
