@@ -18,7 +18,9 @@ public partial class Contract
     /// Please use normal null check instead. This method will be obsolete in the next release.
     /// </remarks>
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void RequiresNotNull<T>(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [NotNull]T? o,
         string? userMessage = null,
         [CallerFilePath] string path = "",
@@ -38,7 +40,9 @@ public partial class Contract
     /// Please use normal null check instead. This method will be obsolete in the next release.
     /// </remarks>
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void RequiresNotNull<T>(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [NotNull]T? o,
         string? userMessage = null,
         [CallerFilePath] string path = "",
@@ -90,7 +94,9 @@ public partial class Contract
     /// Please use normal null check instead. This method will be obsolete in the next release.
     /// </remarks>
     [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void AssertNotNull<T>(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [NotNull]T? value, 
         string? userMessage = null,
         [CallerFilePath] string path = "",
@@ -154,7 +160,9 @@ public partial class Contract
     /// Please use normal null check instead. This method will be obsolete in the next release.
     /// </remarks>
     [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void AssertNotNull<T>(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [NotNull]T? value, 
         string? userMessage = null,
         [CallerFilePath] string path = "",

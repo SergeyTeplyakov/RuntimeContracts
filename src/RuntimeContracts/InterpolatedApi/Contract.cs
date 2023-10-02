@@ -21,7 +21,9 @@ public static partial class Contract
     [Pure]
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
     [DebuggerStepThrough]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void Requires(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
         [InterpolatedStringHandlerArgument("condition")]ref ContractMessageInterpolatedStringHandler userMessage,
@@ -51,7 +53,9 @@ public static partial class Contract
     [Pure]
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS_DEBUG")]
     [DebuggerStepThrough]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void RequiresDebug(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
         [InterpolatedStringHandlerArgument("condition")]ref ContractMessageInterpolatedStringHandler userMessage,
@@ -82,7 +86,9 @@ public static partial class Contract
     [Pure]
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
     [DebuggerStepThrough]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void Requires<TException>(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
         [InterpolatedStringHandlerArgument("condition")]ref ContractMessageInterpolatedStringHandler userMessage,
@@ -111,7 +117,9 @@ public static partial class Contract
     [Pure]
     [Conditional("CONTRACTS_LIGHT_ASSERTS")]
     [DebuggerStepThrough]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void Assert(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
         [InterpolatedStringHandlerArgument("condition")]ref ContractMessageInterpolatedStringHandler userMessage,
@@ -136,7 +144,9 @@ public static partial class Contract
     [Pure]
     [Conditional("CONTRACTS_LIGHT_ASSERTS_DEBUG")]
     [DebuggerStepThrough]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void AssertDebug(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
         [InterpolatedStringHandlerArgument("condition")]ref ContractMessageInterpolatedStringHandler userMessage,

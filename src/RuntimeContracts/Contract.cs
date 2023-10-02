@@ -15,7 +15,7 @@ namespace System.Diagnostics.ContractsLight;
 /// A user may control the "level" by defining following symbols:
 /// - CONTRACTS_LIGHT_PRECONDITIONS - to enable preconditions.
 /// - CONTRACTS_LIGHT_INVARIANTS - to "partially" enable invariants (Invariant method should be called manually).
-/// - CONTRACTS_LIGHT_ASSERTS to enable <see cref="Assert(bool,string,string,string,int)"/> and <see cref="Assume"/> methods.
+/// - CONTRACTS_LIGHT_ASSERTS to enable <see cref="Assert(bool,string,string,string,int)"/> and <see cref="Assume(bool,string?,string,string,int)"/> methods.
 /// - CONTRACTS_LIGHT_QUANTIFIERS to enable quantifiers like <see cref="ForAll{T}"/> or <see cref="Exists{T}"/>.
 ///
 /// Postconditions are no ops in the current version because they require some code manipulation at runtime.
@@ -33,6 +33,7 @@ public static partial class Contract
     /// </summary>
     /// <param name="condition">Boolean expression representing the contract.</param>
     /// <param name="userMessage">User-provided error message.</param>
+    /// <param name="conditionText">Compiler generated expression used for <paramref name="condition"/></param>
     /// <param name="path">Compiler generated path to the file with the assertion.</param>
     /// <param name="lineNumber">Compiler generated line number of the assertion.</param>
     /// <remarks>
@@ -42,7 +43,9 @@ public static partial class Contract
     /// </remarks>
     [Pure]
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void Requires(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition, 
         string? userMessage = null,
@@ -55,7 +58,7 @@ public static partial class Contract
             ContractRuntimeHelper.ReportFailure(ContractFailureKind.Precondition, userMessage, conditionText, new Provenance(path, lineNumber));
         }
     }
-        
+
     /// <summary>
     /// Specifies a contract such that the expression <paramref name="condition"/> must be true before the enclosing method or property is invoked.
     /// </summary>
@@ -70,7 +73,9 @@ public static partial class Contract
     /// </remarks>
     [Pure]
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS_DEBUG")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void RequiresDebug(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition, 
         string? userMessage = null,
@@ -121,7 +126,9 @@ public static partial class Contract
     [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "condition")]
     [Pure]
     [Conditional("CONTRACTS_LIGHT_PRECONDITIONS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void Requires<TException>(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
 #if NETSTANDARD2_0
@@ -151,7 +158,9 @@ public static partial class Contract
     /// <param name="lineNumber">Compiler generated line number of the assertion.</param>
     [Pure]
     [Conditional("CONTRACTS_LIGHT_ASSERTS")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void Assert(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
 #if NETSTANDARD2_0
@@ -167,7 +176,7 @@ public static partial class Contract
             ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path ?? string.Empty, lineNumber));
         }
     }
-        
+
     /// <summary>
     /// Perform a runtime check that <paramref name="condition"/> is true.
     /// </summary>
@@ -177,7 +186,9 @@ public static partial class Contract
     /// <param name="lineNumber">Compiler generated line number of the assertion.</param>
     [Pure]
     [Conditional("CONTRACTS_LIGHT_ASSERTS_DEBUG")]
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
     public static void AssertDebug(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         [DoesNotReturnIf(false)]
         bool condition,
 #if NETSTANDARD2_0
