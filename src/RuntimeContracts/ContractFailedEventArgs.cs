@@ -5,10 +5,10 @@
 /// </summary>
 public sealed class ContractFailedEventArgs : EventArgs
 {
-    internal Exception ThrownDuringHandler;
+    internal Exception? ThrownDuringHandler;
 
     /// <nodoc />
-    public ContractFailedEventArgs(ContractFailureKind failureKind, string message, string condition)
+    public ContractFailedEventArgs(ContractFailureKind failureKind, string message, string? condition)
     {
         FailureKind = failureKind;
         Message = message;
@@ -19,7 +19,7 @@ public sealed class ContractFailedEventArgs : EventArgs
     public string Message { get; }
 
     /// <nodoc />
-    public string Condition { get; }
+    public string? Condition { get; }
 
     /// <nodoc />
     public ContractFailureKind FailureKind { get; }

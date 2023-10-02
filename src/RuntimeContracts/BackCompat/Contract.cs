@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-#nullable enable
-
 namespace System.Diagnostics.ContractsLight;
 
 // This file contains a set of methods that allows using this version with versions 0.3.+ and 0.4.+ without recompilation.
