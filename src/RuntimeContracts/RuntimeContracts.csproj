@@ -6,10 +6,6 @@
         <RootNamespace>System.Diagnostics.ContractsLight</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="RuntimeContracts.Analyzer" Version="0.4.0" />
-    </ItemGroup>
-
     <PropertyGroup>
         <PackageVersion>$(RuntimeContractsVersion)</PackageVersion>
         <Authors>seteplia</Authors>
