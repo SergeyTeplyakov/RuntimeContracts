@@ -1,0 +1,111 @@
+﻿#nullable enable
+override System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler.ToString() -> string!
+static System.Diagnostics.ContractsLight.Contract.Assert(bool condition, ref System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler userMessage, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Assert(bool condition, string! userMessage = null, string! conditionText = "", string! path = null, int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Assert(bool condition, string! userMessage, string! path, int lineNumber) -> void
+static System.Diagnostics.ContractsLight.Contract.AssertDebug(bool condition, ref System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler userMessage, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.AssertDebug(bool condition, string! userMessage = null, string! conditionText = "", string! path = null, int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.AssertDebug(bool condition, string! userMessage, string! path, int lineNumber) -> void
+static System.Diagnostics.ContractsLight.Contract.AssertFailure(string! message = null, string! path = null, int lineNumber = 0) -> System.Exception!
+static System.Diagnostics.ContractsLight.Contract.AssertNotNull<T>(T? value, string? userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.AssertNotNullOrEmpty(string? o, string? userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.AssertNotNullOrWhiteSpace(string? o, string? userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Assume(bool condition, string! userMessage = null, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Assume(bool condition, string! userMessage, string! path, int lineNumber) -> void
+static System.Diagnostics.ContractsLight.Contract.Check(bool condition, string! conditionText = "", string! path = "", int lineNumber = 0) -> System.Diagnostics.ContractsLight.AssertionFailure?
+static System.Diagnostics.ContractsLight.Contract.CheckDebug(bool condition, string! conditionText = "", string! path = "", int lineNumber = 0) -> System.Diagnostics.ContractsLight.AssertionDebugFailure?
+static System.Diagnostics.ContractsLight.Contract.ContractFailed -> System.EventHandler<System.Diagnostics.ContractsLight.ContractFailedEventArgs!>!
+static System.Diagnostics.ContractsLight.Contract.EndContractBlock() -> void
+static System.Diagnostics.ContractsLight.Contract.Ensures(bool condition, string! userMessage = null) -> void
+static System.Diagnostics.ContractsLight.Contract.EnsuresForAll<T>(System.Collections.Generic.IEnumerable<T>! collection, System.Predicate<T>! predicate, string! userMessage = null) -> void
+static System.Diagnostics.ContractsLight.Contract.EnsuresOnThrow<TException>(bool condition, string! message = null) -> void
+static System.Diagnostics.ContractsLight.Contract.Exists(int fromInclusive, int toExclusive, System.Predicate<int>! predicate) -> bool
+static System.Diagnostics.ContractsLight.Contract.Exists<T>(System.Collections.Generic.IEnumerable<T>! collection, System.Predicate<T>! predicate) -> bool
+static System.Diagnostics.ContractsLight.Contract.ForAll<T>(System.Collections.Generic.IEnumerable<T>! collection, System.Predicate<T>! predicate) -> bool
+static System.Diagnostics.ContractsLight.Contract.Invariant(bool condition, string! userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.OldValue<T>(T value) -> T
+static System.Diagnostics.ContractsLight.Contract.Requires(bool condition, ref System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler userMessage, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Requires(bool condition, string! userMessage = null, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Requires(bool condition, string! userMessage, string! path, int lineNumber) -> void
+static System.Diagnostics.ContractsLight.Contract.Requires<TException>(bool condition, ref System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler userMessage, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Requires<TException>(bool condition, string! userMessage = null, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Requires<TException>(bool condition, string! userMessage, string! path, int lineNumber) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresDebug(bool condition, ref System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler userMessage, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresDebug(bool condition, string! userMessage = null, string! conditionText = "", string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresDebug(bool condition, string! userMessage, string! path, int lineNumber) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresForAll<T>(System.Collections.Generic.IEnumerable<T>! collection, System.Predicate<T>! predicate, string! userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresNotNull<T>(T? o, string? userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresNotNullOrEmpty(string? o, string? userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.RequiresNotNullOrWhiteSpace(string? o, string? userMessage = null, string! path = "", int lineNumber = 0) -> void
+static System.Diagnostics.ContractsLight.Contract.Result<T>() -> T
+static System.Diagnostics.ContractsLight.Contract.ValueAtReturn<T>(out T value) -> T
+static System.Diagnostics.ContractsLight.ContractFailureKindExtensions.ToDisplayString(this System.Diagnostics.ContractsLight.ContractFailureKind failureKind) -> string!
+static System.Diagnostics.ContractsLight.ContractFluentExtensions.Assert(this in System.Diagnostics.ContractsLight.AssertionDebugFailure result, string! message) -> void
+static System.Diagnostics.ContractsLight.ContractFluentExtensions.Assert(this in System.Diagnostics.ContractsLight.AssertionFailure result, string! message) -> void
+static System.Diagnostics.ContractsLight.ContractFluentExtensions.Requires(this in System.Diagnostics.ContractsLight.AssertionDebugFailure result, string! message) -> void
+static System.Diagnostics.ContractsLight.ContractFluentExtensions.Requires(this in System.Diagnostics.ContractsLight.AssertionFailure result, string! message) -> void
+System.Diagnostics.ContractsLight.AssertionDebugFailure
+System.Diagnostics.ContractsLight.AssertionDebugFailure.AssertionDebugFailure() -> void
+System.Diagnostics.ContractsLight.AssertionFailure
+System.Diagnostics.ContractsLight.AssertionFailure.AssertionFailure() -> void
+System.Diagnostics.ContractsLight.Contract
+System.Diagnostics.ContractsLight.ContractAbbreviatorAttribute
+System.Diagnostics.ContractsLight.ContractAbbreviatorAttribute.ContractAbbreviatorAttribute() -> void
+System.Diagnostics.ContractsLight.ContractArgumentValidatorAttribute
+System.Diagnostics.ContractsLight.ContractArgumentValidatorAttribute.ContractArgumentValidatorAttribute() -> void
+System.Diagnostics.ContractsLight.ContractClassAttribute
+System.Diagnostics.ContractsLight.ContractClassAttribute.ContractClassAttribute(System.Type! typeContainingContracts) -> void
+System.Diagnostics.ContractsLight.ContractClassAttribute.TypeContainingContracts.get -> System.Type!
+System.Diagnostics.ContractsLight.ContractClassForAttribute
+System.Diagnostics.ContractsLight.ContractClassForAttribute.ContractClassForAttribute(System.Type! typeContractsAreFor) -> void
+System.Diagnostics.ContractsLight.ContractClassForAttribute.TypeContractsAreFor.get -> System.Type!
+System.Diagnostics.ContractsLight.ContractException
+System.Diagnostics.ContractsLight.ContractException.Condition.get -> string!
+System.Diagnostics.ContractsLight.ContractException.ContractException(System.Diagnostics.ContractsLight.ContractFailureKind kind, string! failure, string! userMessage, string! condition, System.Exception! innerException = null) -> void
+System.Diagnostics.ContractsLight.ContractException.Failure.get -> string!
+System.Diagnostics.ContractsLight.ContractException.Kind.get -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractException.UserMessage.get -> string!
+System.Diagnostics.ContractsLight.ContractFailedEventArgs
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.Condition.get -> string!
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.ContractFailedEventArgs(System.Diagnostics.ContractsLight.ContractFailureKind failureKind, string! message, string! condition) -> void
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.FailureKind.get -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.Handled.get -> bool
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.Message.get -> string!
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.SetHandled() -> void
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.SetUnwind() -> void
+System.Diagnostics.ContractsLight.ContractFailedEventArgs.Unwind.get -> bool
+System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKind.Assert = 5 -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKind.Assume = 4 -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKind.Invariant = 3 -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKind.Postcondition = 1 -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKind.PostconditionOnException = 2 -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKind.Precondition = 0 -> System.Diagnostics.ContractsLight.ContractFailureKind
+System.Diagnostics.ContractsLight.ContractFailureKindExtensions
+System.Diagnostics.ContractsLight.ContractFluentExtensions
+System.Diagnostics.ContractsLight.ContractInvariantMethodAttribute
+System.Diagnostics.ContractsLight.ContractInvariantMethodAttribute.ContractInvariantMethodAttribute() -> void
+System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler
+System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler.AppendFormatted<T>(T t) -> void
+System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler.AppendLiteral(string! s) -> void
+System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler.ContractMessageInterpolatedStringHandler() -> void
+System.Diagnostics.ContractsLight.ContractMessageInterpolatedStringHandler.ContractMessageInterpolatedStringHandler(int literalLength, int formattedCount, bool predicate, out bool handlerIsValid) -> void
+System.Diagnostics.ContractsLight.ContractOptionAttribute
+System.Diagnostics.ContractsLight.ContractOptionAttribute.Category.get -> string!
+System.Diagnostics.ContractsLight.ContractOptionAttribute.ContractOptionAttribute(string! category, string! setting, bool enabled) -> void
+System.Diagnostics.ContractsLight.ContractOptionAttribute.ContractOptionAttribute(string! category, string! setting, string! value) -> void
+System.Diagnostics.ContractsLight.ContractOptionAttribute.Enabled.get -> bool
+System.Diagnostics.ContractsLight.ContractOptionAttribute.Setting.get -> string!
+System.Diagnostics.ContractsLight.ContractOptionAttribute.Value.get -> string!
+System.Diagnostics.ContractsLight.ContractPublicPropertyNameAttribute
+System.Diagnostics.ContractsLight.ContractPublicPropertyNameAttribute.ContractPublicPropertyNameAttribute(string! name) -> void
+System.Diagnostics.ContractsLight.ContractPublicPropertyNameAttribute.Name.get -> string!
+System.Diagnostics.ContractsLight.ContractReferenceAssemblyAttribute
+System.Diagnostics.ContractsLight.ContractReferenceAssemblyAttribute.ContractReferenceAssemblyAttribute() -> void
+System.Diagnostics.ContractsLight.ContractRuntimeIgnoredAttribute
+System.Diagnostics.ContractsLight.ContractRuntimeIgnoredAttribute.ContractRuntimeIgnoredAttribute() -> void
+System.Diagnostics.ContractsLight.ContractVerificationAttribute
+System.Diagnostics.ContractsLight.ContractVerificationAttribute.ContractVerificationAttribute(bool value) -> void
+System.Diagnostics.ContractsLight.ContractVerificationAttribute.Value.get -> bool
+System.Diagnostics.ContractsLight.PureAttribute
+System.Diagnostics.ContractsLight.PureAttribute.PureAttribute() -> void
