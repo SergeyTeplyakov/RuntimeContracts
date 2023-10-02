@@ -1,7 +1,7 @@
 ﻿namespace System.Diagnostics.ContractsLight;
 
 /// <summary>
-/// An exception that is generated when a contract violation occurrs.
+/// An exception that is generated when a contract violation occurs.
 /// </summary>
 /// <remarks>
 /// This exception type in Code Contracts is internal, but we made it public intentionally
@@ -14,10 +14,9 @@ public sealed class ContractException : Exception
     {
         public ContractFailureKind Kind;
 
-        public string UserMessage;
+        public string? UserMessage;
 
-        public string Condition;
-
+        public string? Condition;
     }
 
     private ContractExceptionData m_data = default(ContractExceptionData);
@@ -26,11 +25,11 @@ public sealed class ContractException : Exception
 
     public string Failure => Message;
 
-    public string UserMessage => m_data.UserMessage;
+    public string? UserMessage => m_data.UserMessage;
 
-    public string Condition => m_data.Condition;
+    public string? Condition => m_data.Condition;
 
-    public ContractException(ContractFailureKind kind, string failure, string userMessage, string condition, Exception innerException = null) : base(failure, innerException)
+    public ContractException(ContractFailureKind kind, string? failure, string? userMessage, string? condition, Exception? innerException = null) : base(failure, innerException)
     {
         m_data.Kind = kind;
         m_data.UserMessage = userMessage;

@@ -180,5 +180,5 @@ public sealed class ContractOptionAttribute : Attribute
     public bool Enabled { get; }
 
     /// <nodoc />
-    public string Value { get; }
+    public string? Value { get; }
 }

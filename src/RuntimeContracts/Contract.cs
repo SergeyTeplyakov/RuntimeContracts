@@ -45,7 +45,7 @@ public static partial class Contract
     public static void Requires(
         [DoesNotReturnIf(false)]
         bool condition, 
-        string userMessage = null,
+        string? userMessage = null,
         [CallerArgumentExpression("condition")] string conditionText = "",
         [CallerFilePath] string path = "",
         [CallerLineNumber] int lineNumber = 0)
@@ -73,7 +73,7 @@ public static partial class Contract
     public static void RequiresDebug(
         [DoesNotReturnIf(false)]
         bool condition, 
-        string userMessage = null,
+        string? userMessage = null,
         [CallerArgumentExpression("condition")] string conditionText = "",
         [CallerFilePath] string path = "",
         [CallerLineNumber] int lineNumber = 0)
@@ -95,7 +95,7 @@ public static partial class Contract
     public static void RequiresForAll<T>(
         IEnumerable<T> collection, 
         Predicate<T> predicate,
-        string userMessage = null, 
+        string? userMessage = null, 
         [CallerFilePath] string path = "", 
         [CallerLineNumber] int lineNumber = 0)
     {
@@ -127,7 +127,7 @@ public static partial class Contract
 #if NETSTANDARD2_0
             [Localizable(false)]
 #endif
-        string userMessage = null,
+        string? userMessage = null,
         [CallerArgumentExpression("condition")] string conditionText = "",
         [CallerFilePath] string path = "", 
         [CallerLineNumber] int lineNumber = 0) where TException : Exception
@@ -157,14 +157,14 @@ public static partial class Contract
 #if NETSTANDARD2_0
             [Localizable(false)]
 #endif
-        string userMessage = null,
+        string? userMessage = null,
         [CallerArgumentExpression("condition")] string conditionText = "",
-        [CallerFilePath] string path = null, 
+        [CallerFilePath] string? path = null, 
         [CallerLineNumber] int lineNumber = 0)
     {
         if (!condition)
         {
-            ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path, lineNumber));
+            ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path ?? string.Empty, lineNumber));
         }
     }
         
@@ -183,14 +183,14 @@ public static partial class Contract
 #if NETSTANDARD2_0
             [Localizable(false)]
 #endif
-        string userMessage = null,
+        string? userMessage = null,
         [CallerArgumentExpression("condition")] string conditionText = "",
-        [CallerFilePath] string path = null, 
+        [CallerFilePath] string? path = null, 
         [CallerLineNumber] int lineNumber = 0)
     {
         if (!condition)
         {
-            ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path, lineNumber));
+            ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, userMessage, conditionText, new Provenance(path ?? string.Empty, lineNumber));
         }
     }
 
@@ -204,11 +204,11 @@ public static partial class Contract
 #if NETSTANDARD2_0
             [Localizable(false)]
 #endif
-        string message = null,
-        [CallerFilePath] string path = null,
+        string? message = null,
+        [CallerFilePath] string? path = null,
         [CallerLineNumber] int lineNumber = 0)
     {
-        ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, message, null, new Provenance(path, lineNumber));
+        ContractRuntimeHelper.ReportFailure(ContractFailureKind.Assert, message, null, new Provenance(path ?? string.Empty, lineNumber));
 
         // This method should fail regardless of the ContractFailEvent handlers.
         ContractRuntimeHelper.RaiseContractFailedEvent(
@@ -236,7 +236,7 @@ public static partial class Contract
 #if NETSTANDARD2_0
             [Localizable(false)]
 #endif
-        string userMessage = null,
+        string? userMessage = null,
         [CallerArgumentExpression("condition")] string conditionText = "",
         [CallerFilePath] string path = "",
         [CallerLineNumber] int lineNumber = 0)
@@ -268,7 +268,7 @@ public static partial class Contract
 #if NETSTANDARD2_0
             [Localizable(false)]
 #endif
-        string userMessage = null,
+        string? userMessage = null,
         [CallerFilePath] string path = "",
         [CallerLineNumber] int lineNumber = 0)
     {

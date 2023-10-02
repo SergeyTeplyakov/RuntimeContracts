@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
 namespace System.Diagnostics.ContractsLight;
@@ -13,22 +12,24 @@ internal static class ContractRuntimeHelper
     // No inlining is explicit to put the method on the call stack.
     [MethodImpl(MethodImplOptions.NoInlining)]
     [DoesNotReturn]
-    public static void ReportFailure(ContractFailureKind kind, string msg, string conditionTxt, Provenance provenance)
+    public static void ReportFailure(ContractFailureKind kind, string? msg, string? conditionTxt, Provenance provenance)
     {
         if (!RaiseContractFailedEvent(kind, msg, conditionTxt, provenance, out var text))
         {
             TriggerFailure(kind, text, msg, conditionTxt);
         }
+#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return.
     }
+#pragma warning restore CS8763
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void ReportPreconditionFailure<TException>(string msg, string conditionTxt, Provenance provenence) where TException : Exception
+    public static void ReportPreconditionFailure<TException>(string? msg, string? conditionTxt, Provenance provenance) where TException : Exception
 #if !NETSTANDARD2_0
         // Previous version are relies on new constraint for exception construction.
         , new()
 #endif
     {
-        if (!RaiseContractFailedEvent(ContractFailureKind.Precondition, msg, conditionTxt, provenence, out var text))
+        if (!RaiseContractFailedEvent(ContractFailureKind.Precondition, msg, conditionTxt, provenance, out var text))
         {
             // TODO: need to cache the factory or maybe switch to reflection-based approach.
             var factory = GenerateExceptionFactory<TException>();
@@ -37,7 +38,7 @@ internal static class ContractRuntimeHelper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void TriggerFailure(ContractFailureKind kind, string msg, string userMessage, string conditionTxt)
+    public static void TriggerFailure(ContractFailureKind kind, string? msg, string? userMessage, string? conditionTxt)
     {
         throw new ContractException(kind, msg, userMessage, conditionTxt);
     }
@@ -116,7 +117,7 @@ internal static class ContractRuntimeHelper
         }
 #endif
 
-    public static event EventHandler<ContractFailedEventArgs> ContractFailed;
+    public static event EventHandler<ContractFailedEventArgs>? ContractFailed;
 
     /// <summary>
     /// Contract class call this method on a contract failure to allow listeners to be notified.
@@ -132,21 +133,21 @@ internal static class ContractRuntimeHelper
     [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
     public static bool RaiseContractFailedEvent(
         ContractFailureKind failureKind, 
-        string userMessage, 
-        string conditionText, 
+        string? userMessage, 
+        string? conditionText, 
         Provenance provenence, 
         out string resultFailureMessage)
     {
         bool handled = false;
 
         string displayMessage = "contract failed.";  // Incomplete, but in case of OOM during resource lookup...
-        ContractFailedEventArgs eventArgs = null;  // In case of OOM.
+        ContractFailedEventArgs? eventArgs = null;  // In case of OOM.
         try
         {
             displayMessage = GetDisplayMessage(failureKind, userMessage, conditionText, provenence);
             resultFailureMessage = displayMessage;
 
-            EventHandler<ContractFailedEventArgs> contractFailedEventLocal = ContractFailed;
+            EventHandler<ContractFailedEventArgs>? contractFailedEventLocal = ContractFailed;
             if (contractFailedEventLocal != null)
             {
                 eventArgs = new ContractFailedEventArgs(failureKind, displayMessage, conditionText);
@@ -181,16 +182,16 @@ internal static class ContractRuntimeHelper
         return handled;
     }
 
-    private static string GetDisplayMessage(ContractFailureKind failureKind, string userMessage, string conditionText, Provenance provenence)
+    private static string GetDisplayMessage(ContractFailureKind failureKind, string? userMessage, string? conditionText, Provenance provenance)
     {
         string message = GetFailureMessage(failureKind, conditionText);
 
         return string.IsNullOrEmpty(userMessage)
-            ? string.Format(CultureInfo.InvariantCulture, "{0}\r\n\tat {1}", message, provenence)
-            : string.Format(CultureInfo.InvariantCulture, "{0}: {1}\r\n\tat {2}", message, userMessage, provenence);
+            ? string.Format(CultureInfo.InvariantCulture, "{0}\r\n\tat {1}", message, provenance)
+            : string.Format(CultureInfo.InvariantCulture, "{0}: {1}\r\n\tat {2}", message, userMessage, provenance);
     }
 
-    private static string GetFailureMessage(ContractFailureKind failureKind, string conditionText)
+    private static string GetFailureMessage(ContractFailureKind failureKind, string? conditionText)
     {
         return string.IsNullOrEmpty(conditionText)
             ? string.Format(CultureInfo.InvariantCulture, "{0}", failureKind.ToDisplayString())

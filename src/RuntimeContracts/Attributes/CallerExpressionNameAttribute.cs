@@ -18,7 +18,7 @@ namespace System.Runtime.CompilerServices
         {
             get
             {
-                throw null;
+                throw null!;
             }
         }
 

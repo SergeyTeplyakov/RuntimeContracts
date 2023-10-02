@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace System.Diagnostics.ContractsLight;
+﻿namespace System.Diagnostics.ContractsLight;
 
 /// <summary>
 /// Represents an assertion violation.

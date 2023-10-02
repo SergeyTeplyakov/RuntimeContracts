@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-#nullable enable
 namespace System.Diagnostics.ContractsLight;
 
 // This API will be officially obsolete soon because of new interpolated string improvements solve the issue this API is solving but in a more elegant way.

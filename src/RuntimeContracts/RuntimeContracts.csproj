@@ -4,6 +4,7 @@
         <RuntimeContractsVersion>0.5.0.0</RuntimeContractsVersion>
         <TargetFramework>netstandard1.1</TargetFramework>
         <RootNamespace>System.Diagnostics.ContractsLight</RootNamespace>
+        <nullable>enable</nullable>
     </PropertyGroup>
 
     <PropertyGroup>
